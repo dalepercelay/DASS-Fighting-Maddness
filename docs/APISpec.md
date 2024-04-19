@@ -1,14 +1,14 @@
 API Specification for Group Project:
 
 List of API calls:
-1. Get Catalog of Animals (all animals available to be bought)
-2. Create an Animal (user can create an animal to catalog and get money that way)
-3. Create User (id, name, gold, animal, health status for user)
-4. Buy an Animal (for one fight at a time)
-5. Create a Fight (pay 10 gold to fight, gets 0 - 100 chance of winning – higher if higher stats)
-6. Fight Result Update (get money if win, lose health)
-7. Leaderboard (after every fight result updates, the leaderboard updates)
-8. Restock on Resources (buying health)
+Get Catalog of Animals (all animals available to be bought)
+Create an Animal (user can create an animal to catalog and get money that way)
+Create User (id, name, gold, animal, health status for user)
+Buy an Animal (for one fight at a time)
+Create a Fight (pay 10 gold to fight, gets 0 - 100 chance of winning – higher if higher stats)
+Fight Result Update (get money if win, lose health)
+Leaderboard (after every fight result updates, the leaderboard updates)
+Restock on Resources (buying health)
 
 Get Catalog of Animals - GET Method (/catalog/)
 Description: Gets a catalog of all the animals available for purchase. 
@@ -20,7 +20,7 @@ Response:
 	“price”: “integer” 
 }
 
-Create an Animal - POST Method (/create-animal/)
+Create an Animal - POST Method (/create-animal/{name})
 Description: Users can create animals (with given name, stats, price - we create id) and it can be considered an investment. It will take 100 gold for users to create an animal, but once they sell it to the main store, they can sell it for 50 no matter what animal it is. But then the users can create a price to sell their animals for in the catalog. 
 Request:
 {
@@ -33,7 +33,7 @@ Response:
 	“success”: “boolean”
 }
 
-Create User - POST Method (/create-user/)
+Create User - POST Method (/create-user/{name})
 Description: Given a name, create a user which has starting gold 200, no animal, 100 health status (from 0 - 100) for the user.
 Request:
 {
@@ -44,12 +44,12 @@ Response:
 	“user_id”: “integer”
 }
 
-Buy an Animal - POST Method (/buy-animal/)
+Buy an Animal - POST Method (/buy-animal/{name})
 Description: Given an animal id from the catalog, buy an animal (if the user has enough gold). Return if delivery was successful (user had enough gold to buy).
 Request: 
 {
 	“name”: “string”
-}
+]}
 Response:
 {
 	“delivery-status”: “boolean”
@@ -99,6 +99,7 @@ Response:
 
 Technical Flows
 
-Example 1:
-Example 2:
-Example 3:
+Example 1: We will make a pro boxer named Loli Boppi. We start off by calling POST /create-user/Loli-Boppi, and we get back her user id. Loli Boppi comes into our shop, asking to buy an animal for a fight. She starts off by getting a catalog of the animals by calling a GET /catalog. Loli Boppi comes in with 200 gold, and let’s say she was interested in an animal named Feefee that cost 70 gold. She then calls POST /buy-animal/Feefee. She is then charged 70 gold and is left with 130 gold and Feefee afterwards.
+
+Example 2: {Srish}
+Example 3: {Dale}
