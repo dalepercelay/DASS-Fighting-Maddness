@@ -49,7 +49,7 @@ Description: Given an animal id from the catalog, buy an animal (if the user has
 Request: 
 {
 	“name”: “string”
-]}
+}
 Response:
 {
 	“delivery-status”: “boolean”
