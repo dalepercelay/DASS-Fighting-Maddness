@@ -25,7 +25,8 @@ Description: Users can create animals (with given name, stats, price - we create
 Request:
 {
 “name”: “string”
-“stats”: “integer” /* between 1 and 50 */
+“defense”: “integer” /* between 1 and 50 */
+"attack": "integer" /* between 1 and 50 */
 “price”: “integer”
 }
 Response:
