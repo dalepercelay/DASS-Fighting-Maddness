@@ -58,7 +58,8 @@ Response:
 }
 
 Create a Fight - POST Method (/fight/)
-Description: Everyday, there will be one main fight/battle. Users will pay 0 - 10 gold in order to participate in the fight.  
+Description: Everyday, there will be one main fight/battle. Users will pay 0 - 10 gold in order to participate in the fight. There will be three rounds of fighting total. Each round, for both sides, there will be a probability from 1 - 35 and whatever that number is, it will be subtracted from the main health points. Whoever has the lowest amount of health by the end of the three rounds will be the winner, and of course if one side has less than 0 or reached 0 health points, then automatically the other side wins. The 1 - 35 is just an average range of health points you can lose in one round. The higher the defense and attack stats are, the lower the range can go to decrease the amount of health points you lose. Vice versa for the lower the defense and attack stats are, the higher the range of points you can lose will be.
+
 Request:
 {
 	“user_id”: “integer”
