@@ -11,7 +11,7 @@ Leaderboard (after every fight result updates, the leaderboard updates)
 Restock on Resources (buying health)
 
 Get Catalog of Animals - GET Method (/catalog/)
-Description: Gets a catalog of all the animals available for purchase. 
+Description: Gets a catalog of all the animals available for purchase. Only one user can have an animal at a time - when they get the animal, it is removed from catalog.
 Response:
 { 
 	“id”: “integer”
@@ -47,6 +47,7 @@ Response:
 
 Buy an Animal - POST Method (/buy-animal/{name})
 Description: Given an animal id from the catalog, buy an animal (if the user has enough gold). Return if delivery was successful (user had enough gold to buy).
+(An animal starts with 100 health. If their health gets to 0, they cannot be used by the user anymore)
 Request: 
 {
 	“name”: “string”
@@ -57,7 +58,7 @@ Response:
 }
 
 Create a Fight - POST Method (/fight/)
-Description: Everyday, there will be one main fight/battle. Users will pay 0 - 10 gold in order to participate in the fight. If they choose to fight with their animal, they can create a higher chance for them to win the fight.
+Description: Everyday, there will be one main fight/battle. Users will pay 0 - 10 gold in order to participate in the fight.  
 Request:
 {
 	“user_id”: “integer”
@@ -72,7 +73,7 @@ Response:
 
 
 Fight Result Update - GET Method (/fight-result/)
-Description: Winning the fight would allow them to earn money based on how much they choose to bet their gold by 10. For example, if a user bet 10 gold and won the battle, then they can get 100 gold total from the battle (aka bonus) plus 10 gold as a congratulations reward. If they lose the fight though, they just lose the gold they originally bet in the first place.
+Description: Winning the fight would allow them to earn money based on how much they choose to bet their gold by 10. For example, if a user bet 10 gold and won the battle, then they can get 100 gold total from the battle (aka bonus) plus 10 gold as a congratulations reward. If they lose the fight though, they just lose the gold they originally bet in the first place. Furthermore, if they lose, their animal' health is decreased by 20. 
 Response:
 {
 	“reward”: “integer” 10 (if they win) or 0 (if they lose),
