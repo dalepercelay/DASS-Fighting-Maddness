@@ -10,7 +10,7 @@
 7. `Leaderboard` (after every fight result updates, the leaderboard updates)
 8. `Restock on Resources` (buying health)
 
-<h2>Get Catalog of Animals - GET Method `/catalog/`</h2>
+<h2>Get Catalog of Animals - GET Method</h2> `/catalog/`
 Description: Gets a catalog of all the animals available for purchase. Only one user can have an animal at a time - when they get the animal, it is removed from catalog.
 Response:
 ```
