@@ -1,6 +1,6 @@
 <h1>API Specification for Group Project:</h1>
 
-<h2>**List of API calls:**</h2>
+<h2>List of API calls:</h2>
 1. `Get Catalog of Animals` (all animals available to be bought)
 2. `Create an Animal` (user can create an animal to catalog and get money that way)
 3. `Create User` (id, name, gold, animal, health status for user)
@@ -10,7 +10,7 @@
 7. `Leaderboard` (after every fight result updates, the leaderboard updates)
 8. `Restock on Resources` (buying health)
 
-<h2>**Get Catalog of Animals - GET Method `/catalog/`**</h2>
+<h2>Get Catalog of Animals - GET Method `/catalog/`</h2>
 Description: Gets a catalog of all the animals available for purchase. Only one user can have an animal at a time - when they get the animal, it is removed from catalog.
 Response:
 ```
