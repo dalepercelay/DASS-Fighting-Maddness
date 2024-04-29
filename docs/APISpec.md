@@ -25,11 +25,12 @@ Response:
 **Create an Animal - POST Method `/create-animal/{name}`**
 Description: Users can create animals (with given name, stats, price - we create id) and it can be considered an investment. It will take 100 gold for users to create an animal, but once they sell it to the main store, they can sell it for 50 no matter what animal it is. But then the users can create a price to sell their animals for in the catalog. 
 Request:
-```{
-“name”: “string”
-“defense”: “integer” /* between 1 and 50 */
-"attack": "integer" /* between 1 and 50 */
-“price”: “integer”
+```
+{
+	“name”: “string”
+	“defense”: “integer” /* between 1 and 50 */
+	"attack": "integer" /* between 1 and 50 */
+	“price”: “integer”
 }
 ```
 Response:
