@@ -1,6 +1,6 @@
 <h1>API Specification for Group Project:</h1>
 
-<h2>List of API calls:</h2>
+**List of API calls:**
 1. `Get Catalog of Animals` (all animals available to be bought)
 2. `Create an Animal` (user can create an animal to catalog and get money that way)
 3. `Create User` (id, name, gold, animal, health status for user)
