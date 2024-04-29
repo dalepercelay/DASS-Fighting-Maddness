@@ -1,4 +1,4 @@
-API Specification for Group Project:
+<h1>API Specification for Group Project:</h1>
 
 List of API calls:
 Get Catalog of Animals (all animals available to be bought)
