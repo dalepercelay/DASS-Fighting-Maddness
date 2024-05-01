@@ -1,4 +1,4 @@
-# CSC365-GroupProject
+# Fighting Madness
 
 
 dpercela@calpoly.edu Dale Percelay
