@@ -88,12 +88,10 @@ def post_visits(visit_id: int, customers: list[Customer]):
 def create_cart(new_cart: Customer):
     with db.engine.begin() as connection:
         try:
-            connection.execute(sqlalchemy.text("INSERT INTO carts (customer_name) VALUES (:name)"), [{"name": new_cart.customer_name}])
+            print("hi")
         except IntegrityError:
             return "INTEGRITY ERROR!"
-        else:
-            cart_id = connection.execute(sqlalchemy.text("SELECT cart_id FROM carts WHERE customer_name = :name ORDER BY cart_id DESC LIMIT 1"), [{"name": new_cart.customer_name}])
-    return {"cart_id": cart_id.fetchone()[0]}
+    return {"cart_id": 1}
 
 
 class CartItem(BaseModel):
@@ -103,9 +101,7 @@ class CartItem(BaseModel):
 def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
     with db.engine.begin() as connection:
         try:
-            potion_id = connection.execute(sqlalchemy.text("SELECT id FROM mypotiontypes WHERE name = :name"), [{"name": item_sku}])
-            potion_id = potion_id.fetchone()[0]
-            connection.execute(sqlalchemy.text("INSERT INTO cart_items (customer_cart_id, potion_type_id, quantity) VALUES (:cart_id, :potion_id, :quantity)"), [{"cart_id": cart_id, "potion_id": potion_id, "quantity": cart_item.quantity}])
+            print("hi")
         except IntegrityError:
             return "INTEGRITY ERROR!"
     return "OK"
@@ -118,23 +114,7 @@ class CartCheckout(BaseModel):
 def checkout(cart_id: int, cart_checkout: CartCheckout):
     with db.engine.begin() as connection:
         try:
-            # get the potion_type_id and quantity from cart_items table using the cart_id
-            # retrieve the price of the potion from the mypotiontypes table
-            row1 = connection.execute(sqlalchemy.text("SELECT potion_type_id, quantity FROM cart_items WHERE customer_cart_id = :cart_id"), [{"cart_id": cart_id}])
-            r = row1.fetchone()
-            potion_type_id = r[0]
-            quantity = r[1]
-            potion_name = connection.execute(sqlalchemy.text("SELECT name, cost FROM mypotiontypes WHERE id = :potion_type_id"), [{"potion_type_id": potion_type_id}])
-            
-            p = potion_name.fetchone()
-            potion_name = p[0]
-            cost = p[1]
-            # purchasing one bottle at a time
-            connection.execute(sqlalchemy.text("INSERT INTO ledger (gold, potions, ml, potion_type, description, cart_id) VALUES (:cost, -:potions, 0, :potion_type_id, 'sold potion', :cart_id)"), [{"cost": cost, "potion_type_id": potion_type_id, "potions": quantity, "cart_id": cart_id}])
-            name = connection.execute(sqlalchemy.text("SELECT customer_name FROM carts WHERE cart_id = :id"), [{"id": cart_id}])
-            connection.execute(sqlalchemy.text("INSERT INTO search_orders (customer, potion_id, gold, cart_id) VALUES (:name ,:potion_type_id, :cost, :cart_id)"), [{"name": name.fetchone()[0], "cost": cost, "potion_type_id": potion_type_id, "cart_id": cart_id}])
-            connection.execute(sqlalchemy.text("UPDATE cart_items SET status = 'successful' WHERE customer_cart_id = :cart_id"), [{"cart_id": cart_id}])
-            totalgold = cost * quantity
+            print("hi")
         except IntegrityError:
             return "INTEGRITY ERROR!"
-        return {"total_potions_bought": quantity, "total_gold_paid": totalgold}
+        return {"total_potions_bought": 1, "total_gold_paid": 1}
