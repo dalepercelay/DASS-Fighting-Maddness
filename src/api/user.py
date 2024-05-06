@@ -20,10 +20,12 @@ def create_user(name: str):
     with db.engine.begin() as connection:
         try:
             id = connection.execute(sqlalchemy.text("INSERT INTO users (name, gold) VALUES (:name, 200) RETURNING user_id"), [{"name": name}])
-            print(f"user_id: {id.fetchone()[0]}")
+            user_id = id.fetchone()[0]
+            connection.execute(sqlalchemy.text("INSERT INTO transactions (user_id, user_name, gold, description) VALUES (:user_id, :user_name, :money, :description)"), [{"user_id": user_id, "user_name": name, "money": 200, "description": "create new user"}])
+            print(f"user_id: {user_id}")
         except IntegrityError:
             return "INTEGRITY ERROR!"
-    return "Successfully created a user"
+    return f"Successfully created a user: {user_id}"
 
 if __name__ == "__main__":
     print(create_user())
