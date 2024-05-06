@@ -19,7 +19,7 @@ def create_user(name: str):
     # create a user
     with db.engine.begin() as connection:
         try:
-            id = connection.execute(sqlalchemy.text("INSERT INTO users (name, gold) VALUES (:name, 200) RETURNING id"), [{"name": name}])
+            id = connection.execute(sqlalchemy.text("INSERT INTO users (name, gold) VALUES (:name, 200) RETURNING user_id"), [{"name": name}])
             print(f"user_id: {id.fetchone()[0]}")
         except IntegrityError:
             return "INTEGRITY ERROR!"

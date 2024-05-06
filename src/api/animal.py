@@ -5,9 +5,6 @@ from src.api import auth
 import sqlalchemy
 from src import database as db
 
-# create animal
-# buy animal
-
 router = APIRouter(
     prefix="/animal",
     tags=["animal"],
@@ -19,7 +16,7 @@ def buy_animal(animal_name: str, user_name: str):
     status = False
     with db.engine.begin() as connection:
         try:
-            user = connection.execute(sqlalchemy.text("SELECT gold, id FROM users WHERE name = :user_name"), [{"user_name": user_name}])
+            user = connection.execute(sqlalchemy.text("SELECT gold, user_id FROM users WHERE name = :user_name"), [{"user_name": user_name}])
             price = connection.execute(sqlalchemy.text("SELECT price FROM animals WHERE name = :animal_name"), [{"animal_name": animal_name}])
             user = user.fetchone()
             price = price.fetchone()[0]
