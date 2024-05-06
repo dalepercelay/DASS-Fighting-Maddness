@@ -67,3 +67,6 @@ create table
     availability boolean null default true,
     constraint animal_pkey primary key (animal_id)
   ) tablespace pg_default;
+
+-- INSERT statements
+INSERT INTO animals (name, attack, defense, price) VALUES ("FeeFee", 30, 40, 70)
