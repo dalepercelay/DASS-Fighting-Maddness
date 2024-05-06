@@ -10,15 +10,16 @@
 7. `Leaderboard` (after every fight result updates, the leaderboard updates)
 8. `Restock on Resources` (buying health)
 
-**Get Catalog of Animals - GET Method** `/catalog/`
-Description: Gets a catalog of all the animals available for purchase. Only one user can have an animal at a time - when they get the animal, it is removed from catalog.
+**Get Catalog of Animals - GET Method** `/catalog`
+Description: Gets a catalog of all the animals available for purchase. One user can have an animal at a time - when they get the animal, it is removed from catalog by their availability = FALSE.
 Response:
 ```
 { 
 	“id”: “integer”
 	“name”: “string”
-	“stats”: “integer” /* between 1 and 100 */
-	“price”: “integer” 
+	“attack”: “integer” /* between 1 and 100 */
+	"defense": "integer" /* between 1 and 100 */
+	“price”: “integer”
 }
 ```
 
@@ -40,7 +41,7 @@ Response:
 }
 ```
 **Create User - POST Method `/create-user/{name}`**
-Description: Given a name, create a user which has starting gold 200, no animal, 100 health status (from 0 - 100) for the user.
+Description: Given a name, it creates a user which has a starting gold of 200, and no animals for fighting.
 Request:
 ```
 {
@@ -53,13 +54,13 @@ Response:
 	“user_id”: “integer”
 }
 ```
-**Buy an Animal - POST Method `/buy-animal/{name}`**
-Description: Given an animal id from the catalog, buy an animal (if the user has enough gold). Return if delivery was successful (user had enough gold to buy).
-(An animal starts with 100 health. If their health gets to 0, they cannot be used by the user anymore)
+**Buy an Animal - POST Method `/buy-animal/{animal_name}`**
+Description: Buy an animal (if the user has enough gold). Return True if delivery was successful (user had enough gold to buy) otherwise False. (An animal starts with 100 health. If their health gets to 0, they cannot be used by the user anymore)
 Request:
 ```
 {
-	“name”: “string”
+	“animal_name”: “string”
+	"user_name": "string"
 }
 ```
 Response:
