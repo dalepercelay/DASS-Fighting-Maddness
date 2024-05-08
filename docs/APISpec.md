@@ -88,7 +88,7 @@ Response:
 	“success”: “boolean”
 }
 ```
-**Fight Result Update - GET Method `/fight-result/`**
+**Fight Result Update - GET Method `/fight/result/`**
 Description: Winning the fight would allow them to earn money based on how much they choose to bet their gold by 10. For example, if a user bet 10 gold and won the battle, then they can get 100 gold total from the battle (aka bonus) plus 10 gold as a congratulations reward. If they lose the fight though, they just lose the gold they originally bet in the first place. Furthermore, if they lose, their animal' health is decreased by 20. 
 Response:
 ```
