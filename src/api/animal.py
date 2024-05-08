@@ -11,6 +11,10 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
+@router.post("/create-animal/{name}")
+def create_animal():
+    return "OK"
+
 @router.post("/buy-animal/{animal_name}")
 def buy_animal(animal_id: int, animal_name: str, user_id: int, user_name: str):
     status = False
