@@ -23,5 +23,11 @@ def get_inventory():
     return {"number_of_potions": 1, "ml_in_barrels": 1, "gold": 1}
 
 @router.get("/restock")
-def get_inventory():
-    return "OK"
+def restock(user_id: int, gold: int):
+    # TODO:
+    # get gold spent and calculate health to restore to animal based on gold
+
+    # add to transactions a new row subtracting gold and adding health
+
+
+    return "OK" # gold spent, health restored

@@ -13,4 +13,9 @@ router = APIRouter(
 
 @router.get("/")
 def leaderboard():
-    return "OK"
+    # TODO:
+    # get a list of users join on transactions table order by SUM(gold) -> can't use aggregate functions
+    # at end of SQL statement so figure it out by windowing?
+
+    # also use the row_number to figure out ties -> up to you how to implement
+    return "OK" # a list of users in the leaderboard order

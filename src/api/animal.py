@@ -12,8 +12,12 @@ router = APIRouter(
 )
 
 @router.post("/create-animal/{name}")
-def create_animal():
-    return "OK"
+def create_animal(animal_name: str, attack: int, defense: int):
+    # create an animal with animal name, attack and defense
+    # price is equal to sum of the stats
+
+
+    return "OK" # animal_id
 
 @router.post("/buy-animal/{animal_name}")
 def buy_animal(animal_id: int, animal_name: str, user_id: int):
@@ -29,10 +33,15 @@ def buy_animal(animal_id: int, animal_name: str, user_id: int):
             if user.gold > animal.price:
                 print("user can afford animal")
 
-
                 # check if unowned
                 if(animal.user_id is None):
                     print("animal is available")
+
+                    # TODO: check if user already has an animal
+                    # if so, unassign the user_id from that animal by setting it to NULL 
+                    # and reset animal health to 100 by finding the difference between 100 
+                    # and current health and adding that to transations
+
                     # insert into transactions 
                     connection.execute(sqlalchemy.text("INSERT INTO transactions (user_id, gold, desc) VALUES (:user_id, -:gold, :desc)"), [{"user_id": user[2], "gold": animal.price, "desc": "buy animal"}])
 
