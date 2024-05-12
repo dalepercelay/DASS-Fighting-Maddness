@@ -17,10 +17,19 @@ def get_inventory(username: str):
     # query in the actual data
     try:
         with db.engine.begin() as connection:
-            print("hi")
+            ids = connection.execute(sqlalchemy.text("SELECT COALESCE(animal_id, -1), user_id FROM users WHERE UPPER(name) LIKE UPPER(:name)"), [{"name": username}])
+            ids = ids.fetchone()
+            stats = connection.execute(sqlalchemy.text("SELECT SUM(gold), SUM(health) FROM transactions WHERE user_id = :user_id"), [{"user_id": ids[1]}])
+            stats = stats.fetchone()
+            
+            animal = ids[0]
+            if ids[0] != -1:
+                # get the animal name
+                animal = connection.execute(sqlalchemy.text("SELECT name FROM animals WHERE animal_id = :animal_id"), [{"animal_id": ids[0]}])
+                animal = animal.fetchone()[0]
     except IntegrityError:
         return "INTEGRITY ERROR!"
-    return {"number_of_potions": 1, "ml_in_barrels": 1, "gold": 1}
+    return {"gold": stats[0], "animal": animal, "health": stats[1]}
 
 @router.get("/restock")
 def restock(user_id: int, gold: int):

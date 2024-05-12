@@ -133,5 +133,6 @@ Response:
 ```
 {
 	"gold": "integer"
-	“animal”: “str” (name of animal if it has one)
+	“animal”: “str” (name of animal if it has one, otherwise it will return -1)
+	"health": "integer"
 }
