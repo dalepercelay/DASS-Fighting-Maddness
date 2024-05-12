@@ -25,9 +25,33 @@ def get_inventory():
 @router.get("/restock")
 def restock(user_id: int, gold: int):
     # TODO:
-    # get gold spent and calculate health to restore to animal based on gold
 
-    # add to transactions a new row subtracting gold and adding health
+    #check if user has enough gold
+    with db.engine.begin() as connection:
+        try:
+            # find user's gold
+            user = connection.execute(sqlalchemy.text("""SELECT SUM(gold) AS gold FROM 
+                                                      transactions WHERE user_id = :user_id"""), 
+                                                      [{"user_id": user_id}]).one()
+
+            if user.gold > gold:
+                print("uer has enough gold to restore health")
+                health = gold * 2
+
+            # insert into transactions 
+            animal_id = connection.execute(sqlalchemy.text("""SELECT animal_id FROM users 
+                                                           WHERE user_id = :user_id"""), 
+                                                           [{"user_id": user_id}]).one().animal_id
 
 
-    return "OK" # gold spent, health restored
+            connection.execute(sqlalchemy.text("""INSERT INTO transactions (user_id, gold, animal_id, health, description) 
+                                               VALUES (:user_id, -:gold, :animal_id, :health, :description)"""),
+                                                 [{"user_id": user_id, "gold": gold, 
+                                                   "animal_id": animal_id, "health": health, 
+                                                   "description": "restore health"}])
+
+        except IntegrityError:
+            return "INTEGRITY ERROR!"
+
+
+    return f"restored {health} health with {gold} gold" # gold spent, health restored

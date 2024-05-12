@@ -21,7 +21,7 @@ def create_user(name: str):
         try:
             id = connection.execute(sqlalchemy.text("INSERT INTO users (name) VALUES (:name) RETURNING user_id"), [{"name": name}])
             user_id = id.fetchone()[0]
-            connection.execute(sqlalchemy.text("INSERT INTO transactions (user_id, user_name, gold, description) VALUES (:user_id, :user_name, :money, :description)"), [{"user_id": user_id, "user_name": name, "money": 200, "description": "starting gold"}])
+            connection.execute(sqlalchemy.text("INSERT INTO transactions (user_id, gold, description) VALUES (:user_id, :gold, :description)"), [{"user_id": user_id, "gold": 200, "description": "starting gold"}])
             print(f"user_id: {user_id}")
         except IntegrityError:
             return "INTEGRITY ERROR!"
