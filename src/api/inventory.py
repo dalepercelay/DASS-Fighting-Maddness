@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 @router.get("/audit")
-def get_inventory():
+def get_inventory(username: str):
     # query in the actual data
     try:
         with db.engine.begin() as connection:
