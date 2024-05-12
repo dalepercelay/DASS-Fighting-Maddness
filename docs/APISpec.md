@@ -120,3 +120,18 @@ Response:
 	“health”: “integer” /* return updated health (old + updated from gold) */
 }
 ```
+
+**Get Inventory - GET Method `/inventory/audit`**
+Description: Retrieve user inventory
+Request:
+```
+{
+	“username”: “str”
+}
+```
+Response:
+```
+{
+	"gold": "integer"
+	“animal”: “str” (name of animal if it has one)
+}
