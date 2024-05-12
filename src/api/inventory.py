@@ -24,8 +24,6 @@ def get_inventory():
 
 @router.get("/restock")
 def restock(user_id: int, gold: int):
-    # TODO:
-
     #check if user has enough gold
     with db.engine.begin() as connection:
         try:
