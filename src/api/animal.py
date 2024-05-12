@@ -49,11 +49,18 @@ def buy_animal(animal_id: int, animal_name: str, user_id: int):
                 # check if unowned
                 if(animal.user_id is None):
                     print("animal is available")
-
-                    # TODO: check if user already has an animal
-                    # if so, unassign the user_id from that animal by setting it to NULL 
-                    # and reset animal health to 100 by finding the difference between 100 
-                    # and current health and adding that to transations
+                    # check if user already has an animal
+                    id = connection.execute(sqlalchemy.text("SELECT animal_id FROM users WHERE user_id = :user_id"), [{"user_id": user_id}]).one()
+                    if id.animal_id is not None:
+                        # if so, unassign the user_id from that animal by setting it to NULL 
+                        # #TODO: cannot assign user_id and animal_id foreign keys to NULL
+                        
+                        # and reset animal health to 100 by finding the difference between 100
+                        health = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), [{"animal_id": animal_id}])
+                        # and current health and adding that to transations
+                        add_back = 100 - int(health.fetchone()[0])
+                        description = "restored health back to 100 for " + animal_name
+                        connection.execute(sqlalchemy.text("INSERT INTO transactions (animal_id, health, description) VALUES (:animal_id, :add_back, :description)"), [{"animal_id": animal_id, "add_back": add_back, "description": description}]) 
 
                     # insert into transactions 
                     connection.execute(sqlalchemy.text("""INSERT INTO transactions (user_id, gold, description) 
