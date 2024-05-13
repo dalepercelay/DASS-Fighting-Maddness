@@ -33,7 +33,7 @@ app.add_middleware(
 )"""
 
 app.include_router(inventory.router)
-app.include_router(carts.router)
+#app.include_router(carts.router)
 app.include_router(catalog.router)
 app.include_router(user.router)
 app.include_router(animal.router)
