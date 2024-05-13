@@ -38,7 +38,7 @@ def create_fight(user_id: int, entry_fee: int):
 
     return "OK" # fight outcome, gold and health change
 
-@router.get("/result")
-def fight_result():
-    # should be implemented in create-fight --> not two separate functions
-    return "OK"
+# @router.get("/result")
+# def fight_result():
+#     # should be implemented in create-fight --> not two separate functions
+#     return "OK"

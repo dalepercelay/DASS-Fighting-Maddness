@@ -54,6 +54,8 @@ def buy_animal(animal_id: int, animal_name: str, user_id: int):
                     if id.animal_id is not None:
                         # if so, unassign the user_id from that animal by setting it to NULL 
                         # #TODO: cannot assign user_id and animal_id foreign keys to NULL
+
+                        connection.execute(sqlalchemy.text("UPDATE animals SET user_id = NULL WHERE user_id = :user_id"), [{"user_id": user_id}])
                         
                         # and reset animal health to 100 by finding the difference between 100
                         health = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), [{"animal_id": animal_id}])

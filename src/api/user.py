@@ -27,12 +27,12 @@ def create_user(name: str):
             return "INTEGRITY ERROR!"
     return f"Successfully created a user: {user_id}"
 
-@router.post("/get-inventory")
-def get_inventory(user_id: int):
-    # TODO: 
-    # return sum gold, animal name, animal health
+# @router.post("/get-inventory")
+# def get_inventory(user_id: int):
+#     # TODO: 
+#     # return sum gold, animal name, animal health
 
-    return "OK"
+#     return "OK"
 
 if __name__ == "__main__":
     print(create_user())
