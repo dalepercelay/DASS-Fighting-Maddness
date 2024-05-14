@@ -22,7 +22,7 @@ def create_fight(user_id:int, payment:int):
                                            "VALUES (:description, :gold)"), {"description": description, "gold": -payment})
         enemy_result = connection.execute(sqlalchemy.text("SELECT * FROM Enemies ORDER BY RANDOM() LIMIT 1"))
         enemy_row = enemy_result.fetchone()
-        enemy_name = enemy_row[0]
+        enemy_name = enemy_row[2]
         enemy_stats = {"attack": enemy_row[4], "defense": enemy_row[5]}
         enemy_health = enemy_row[3]
         sql_query = """SELECT a.name, u.name, a.attack, a.defense, a.health FROM users u
