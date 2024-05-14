@@ -5,8 +5,7 @@
 2. `Create an Animal` (user can create an animal to catalog and get money that way)
 3. `Create User` (id, name, gold, animal, health status for user)
 4. `Buy an Animal` (for one fight at a time)
-5. `Create a Fight` (pay 10 gold to fight, gets 0 - 100 chance of winning – higher if higher stats)
-6. `Fight Result Update` (get money if win, lose health)
+5. `Create a Fight` (pay up to 10 gold to fight, gets 0 - 100 chance of winning – higher if higher stats)
 7. `Leaderboard` (after every fight result updates, the leaderboard updates)
 8. `Restock on Resources` (buying health)
 
@@ -70,17 +69,19 @@ Response:
 }
 ```
 **Create a Fight - POST Method `/fight/`**
-Description: Everyday, there will be one main fight/battle. Users will pay 0 - 10 gold in order to participate in the fight. A random enemy will be picked out in the database table called Enemies to fight, and they will have their own respective stats, health, and name.
+Description: Everyday, there will be one main fight/battle. Users will pay any amount of gold (basically betting in your luck) in order to participate in the fight. A random enemy will be picked out in the database table called Enemies to fight, and they will have their own respective stats, health, and name.
 
 There will be three rounds of fighting total. Each round, for both sides, there will be a probability from 1 - 35 and whatever that number is, it will be subtracted from the main health points. Whoever has the lowest amount of health by the end of the three rounds will be the winner, and of course if one side has less than 0 or reached 0 health points, then automatically the other side wins. The 1 - 35 is just an average range of health points you can lose in one round. The higher the defense and attack stats are, the lower the range can go to decrease the amount of health points you lose. Vice versa for the lower the defense and attack stats are, the higher the range of points you can lose will be.
 
-Winning the fight would allow them to earn money based on how much they choose to bet their gold by 10. For example, if a user bet 10 gold and won the battle, then they can get 100 gold total from the battle (aka bonus) plus 10 gold as a congratulations reward. If they lose the fight though, they just lose the gold they originally bet in the first place. Furthermore, if they lose, their animal' health is decreased by 20. 
+Winning the fight would allow them to earn money based on how much they choose to bet their gold by 10. For example, if a user bet 10 gold and won the battle, then they can get 100 gold total from the battle (aka bonus) plus 10 gold as a congratulations reward. If they lose the fight though, they just lose the gold they originally bet in the first place. Furthermore, if they lose, their animal' health is decreased by 20.
+
+Additionally, if their animal is too weak (health is less than or equal to 10) because the user hasn't restocked them, they will lose that animal completely so it's important to occassionally check up on the inventory!!
 
 Request:
 ```
 {
 	“user_id”: “integer”
-	“payment”: “integer” /* between 1 - 10 */
+	“payment”: “integer”
 }
 ```
 Response:
@@ -95,7 +96,8 @@ Response:
 
 **Leaderboard - GET Method `/leaderboard/`**
 Description: Everyday, the leaderboard would be updated based on the rankings of users with the highest amount of gold
-Response: (ordered by number of gold)
+
+Response: (ordered by number of gold in ascending order)
 ```
 {
 	“name”: “string” /* user name */
@@ -103,7 +105,10 @@ Response: (ordered by number of gold)
 }
 ```
 **Restock on Resources - POST Method `/restock/`**
-Description: After every fight/battle, the user will need to purchase gold to restock their health accordingly. They will purchase 10 gold for 20 health, 20 gold for 40 health, and 30 gold for 60 health
+Description: After every fight/battle, the user will need to purchase gold to restock their animal's health accordingly. They will purchase 10 gold for 20 health, 20 gold for 40 health, and 30 gold for 60 health.
+
+The maximum health they can fill up to is back to 100.
+
 Request:
 ```
 {

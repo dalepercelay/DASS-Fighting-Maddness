@@ -16,8 +16,8 @@ def create_fight(user_id:int, payment:int):
     with db.engine.begin() as connection:
         # make sure user has an animal before fighting
         animal_id = connection.execute(sqlalchemy.text("SELECT COALESCE(animal_id, -1) FROM users WHERE user_id = :user_id"), {"user_id": user_id})
-        
-        if animal_id.fetchone()[0] == -1:
+        animal_id = animal_id.fetchone()[0]
+        if animal_id == -1:
             return "Cannot fight because you don't have an animal! Buy one at the shop!"
         
         sql_query = """SELECT a.name, u.name, a.attack, a.defense, a.health FROM users u
@@ -36,8 +36,8 @@ def create_fight(user_id:int, payment:int):
         bonus = 0
         reward = 0
         description = "FIGHT!"
-        transaction_id = connection.execute(sqlalchemy.text("INSERT INTO transactions (description,gold)"
-                                           "VALUES (:description, :gold) RETURNING transaction_id"), {"description": description, "gold": -payment})
+        transaction_id = connection.execute(sqlalchemy.text("INSERT INTO transactions (user_id, description, gold)"
+                                           "VALUES (:user_id, :description, :gold) RETURNING transaction_id"), {"user_id": user_id, "description": description, "gold": -payment})
         enemy_result = connection.execute(sqlalchemy.text("SELECT * FROM Enemies ORDER BY RANDOM() LIMIT 1"))
         enemy_row = enemy_result.fetchone()
         enemy_id = enemy_row[0]
@@ -70,12 +70,17 @@ def create_fight(user_id:int, payment:int):
         # insert into the fight table
         transaction_id = transaction_id.fetchone()[0]
         outcome = winner + " won!"
-        connection.execute(sqlalchemy.text("INSERT INTO fights (outcome, animal_id, user_id, enemy_id, transaction_id) VALUES (:outcome, :animal_id, :user_id, :enemy_id, :transaction_id)"), {"outcome": outcome, "enemy_id": enemy_id, "animal_id": animal_id, "user_id": user_id, "transaction_id": transaction_id})
+        connection.execute(sqlalchemy.text("INSERT INTO fights (outcome, animal_id, user_id, enemy_id, transaction_id) VALUES (:outcome, :animal_id, :user_id, :enemy_id, :transaction_id);"), {"outcome": outcome, "enemy_id": enemy_id, "animal_id": animal_id, "user_id": user_id, "transaction_id": transaction_id})
            
         # update transactions table for result 
         result_sql = "INSERT INTO transactions (user_id, gold, description, animal_id) VALUES (:user_id, :gold, :description, :animal_id);"
         # update animal health
-        result_sql += "INSERT INTO transactions (description, animal_id, health) VALUES ('animal injury after fight', :animal_id, -:health)"
+        animal_h = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), {"animal_id": animal_id})
+        animal_h = animal_h.fetchone()[0]
+        # always make sure animal health can only go down to 0 minimum
+        if animal_h - total_user_damage <= 0:
+            total_user_damage = animal_h
+        result_sql += "INSERT INTO transactions (description, animal_id, health) VALUES ('animal injury after fight', :animal_id, -:health);"
         connection.execute(sqlalchemy.text(result_sql), {"health": total_user_damage, "animal_id": animal_id, "user_id": user_id, "description": "fight result", "gold": bonus + reward})
         
     return {
