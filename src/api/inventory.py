@@ -42,15 +42,22 @@ def restock(user_id: int, gold: int):
                                                       transactions WHERE user_id = :user_id"""), 
                                                       [{"user_id": user_id}]).one()
 
+            health = 0
             if user.gold > gold:
-                print("uer has enough gold to restore health")
+                print("user has enough gold to restore health")
                 health = gold * 2
-
+            
             # insert into transactions 
             animal_id = connection.execute(sqlalchemy.text("""SELECT animal_id FROM users 
                                                            WHERE user_id = :user_id"""), 
                                                            [{"user_id": user_id}]).one().animal_id
 
+            # find out how much health the animal has
+            health_ani = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), {"animal_id": animal_id})
+            health_ani = health_ani.fetchone()[0]
+            # cap max health at 100
+            if health_ani + health >= 100:
+                health = abs(100 - health_ani)
 
             connection.execute(sqlalchemy.text("""INSERT INTO transactions (user_id, gold, animal_id, health, description) 
                                                VALUES (:user_id, -:gold, :animal_id, :health, :description)"""),
