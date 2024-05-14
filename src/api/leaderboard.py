@@ -13,9 +13,11 @@ router = APIRouter(
 
 @router.get("/")
 def leaderboard():
-    # TODO:
-    # get a list of users join on transactions table order by SUM(gold) -> can't use aggregate functions
-    # at end of SQL statement so figure it out by windowing?
+    with db.engine.begin() as connection:
+        users = connection.execute(sqlalchemy.text("""SELECT users.name, SUM(transactions.gold) AS gold 
+                                                        FROM users
+                                                        JOIN transactions ON users.user_id = transactions.user_id
+                                                        GROUP BY users.name
+                                                        ORDER BY gold DESC;""")).fetchall()
 
-    # also use the row_number to figure out ties -> up to you how to implement
-    return "OK" # a list of users in the leaderboard order
+    return [{"name": user[0], "gold": user[1]} for user in users]
