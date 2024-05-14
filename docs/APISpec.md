@@ -74,29 +74,25 @@ Description: Everyday, there will be one main fight/battle. Users will pay 0 - 1
 
 There will be three rounds of fighting total. Each round, for both sides, there will be a probability from 1 - 35 and whatever that number is, it will be subtracted from the main health points. Whoever has the lowest amount of health by the end of the three rounds will be the winner, and of course if one side has less than 0 or reached 0 health points, then automatically the other side wins. The 1 - 35 is just an average range of health points you can lose in one round. The higher the defense and attack stats are, the lower the range can go to decrease the amount of health points you lose. Vice versa for the lower the defense and attack stats are, the higher the range of points you can lose will be.
 
+Winning the fight would allow them to earn money based on how much they choose to bet their gold by 10. For example, if a user bet 10 gold and won the battle, then they can get 100 gold total from the battle (aka bonus) plus 10 gold as a congratulations reward. If they lose the fight though, they just lose the gold they originally bet in the first place. Furthermore, if they lose, their animal' health is decreased by 20. 
+
 Request:
 ```
 {
 	“user_id”: “integer”
-	“animal-use”: “boolean” /* true if using their animal */
 	“payment”: “integer” /* between 1 - 10 */
 }
 ```
 Response:
 ```
 {
-	“success”: “boolean”
+	"reward": "integer"
+	"bonus": "integer"
+	"enemy fought": "string"
+	"winner": "string"
 }
 ```
-**Fight Result Update - GET Method `/fight/result/`**
-Description: Winning the fight would allow them to earn money based on how much they choose to bet their gold by 10. For example, if a user bet 10 gold and won the battle, then they can get 100 gold total from the battle (aka bonus) plus 10 gold as a congratulations reward. If they lose the fight though, they just lose the gold they originally bet in the first place. Furthermore, if they lose, their animal' health is decreased by 20. 
-Response:
-```
-{
-	“reward”: “integer” 10 (if they win) or 0 (if they lose),
-	“bonus”: “integer” (amount of gold user bet) * 10 (if they win) or 0 (if they lose)
-}
-```
+
 **Leaderboard - GET Method `/leaderboard/`**
 Description: Everyday, the leaderboard would be updated based on the rankings of users with the highest amount of gold
 Response: (ordered by number of gold)
