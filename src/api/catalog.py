@@ -10,7 +10,7 @@ def get_catalog():
         # return the list of all available animals in the catalog
         mylist = []
         with db.engine.begin() as connection:
-            animals = connection.execute(sqlalchemy.text("SELECT animal_id, name, attack, defense, price FROM animals WHERE user_id IS NULL"))
+            animals = connection.execute(sqlalchemy.text("SELECT animal_id, name, attack, defense, price FROM animals WHERE in_use IS FALSE"))
             for animal in animals.fetchall():
                 mylist.append(
                     {

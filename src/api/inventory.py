@@ -14,29 +14,41 @@ router = APIRouter(
 
 @router.get("/audit")
 def get_inventory(user_id: int):
-    # query in the actual data
+    # query in the actual data    
     try:
         with db.engine.begin() as connection:
             ids = connection.execute(sqlalchemy.text("SELECT COALESCE(animal_id, -1) FROM users WHERE user_id = :user_id"), [{"user_id": user_id}])
-            ids = ids.fetchone()
+            try:
+                ids = ids.fetchone()[0]
+            except TypeError:
+                return f"user_id of {user_id} doesn't exist"
             gold = connection.execute(sqlalchemy.text("SELECT SUM(gold) FROM transactions WHERE user_id = :user_id"), [{"user_id": user_id}])
             gold = gold.fetchone()
-            health = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), [{"animal_id": ids[0]}])
-            health = health.fetchone()
-            animal = ids[0]
-            if ids[0] != -1:
+            if ids != -1:
                 # get the animal name
-                animal = connection.execute(sqlalchemy.text("SELECT name FROM animals WHERE animal_id = :animal_id"), [{"animal_id": ids[0]}])
+                animal = connection.execute(sqlalchemy.text("SELECT name FROM animals WHERE animal_id = :animal_id"), [{"animal_id": ids}])
                 animal = animal.fetchone()[0]
+                health = connection.execute(sqlalchemy.text("SELECT COALESCE(SUM(health), 0) FROM transactions WHERE animal_id = :animal_id"), [{"animal_id": ids}])
+                health = health.fetchone()[0]
+            else:
+                animal = "No animal in inventory"
+                health = "No animal health"
     except IntegrityError:
         return "INTEGRITY ERROR!"
-    return {"gold": gold[0], "animal": animal, "animal health": health[0]}
+    return {"gold": gold[0], "animal": animal, "animal health": health}
 
 @router.get("/restock")
 def restock(user_id: int, gold: int):
     #check if user has enough gold
     with db.engine.begin() as connection:
         try:
+            # first find out if an animal exists for user
+            try:
+                animal_id = connection.execute(sqlalchemy.text("""SELECT animal_id FROM users 
+                                                            WHERE user_id = :user_id"""), 
+                                                            [{"user_id": user_id}]).one().animal_id
+            except sqlalchemy.exc.NoResultFound:
+                return "No user found"
             # find user's gold
             user = connection.execute(sqlalchemy.text("""SELECT SUM(gold) AS gold FROM 
                                                       transactions WHERE user_id = :user_id"""), 
@@ -44,20 +56,18 @@ def restock(user_id: int, gold: int):
 
             health = 0
             if user.gold > gold:
-                print("user has enough gold to restore health")
+                print("User has enough gold to restore health")
                 health = gold * 2
-            
-            # insert into transactions 
-            animal_id = connection.execute(sqlalchemy.text("""SELECT animal_id FROM users 
-                                                           WHERE user_id = :user_id"""), 
-                                                           [{"user_id": user_id}]).one().animal_id
 
             # find out how much health the animal has
             health_ani = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), {"animal_id": animal_id})
             health_ani = health_ani.fetchone()[0]
             # cap max health at 100
-            if health_ani + health >= 100:
-                health = abs(100 - health_ani)
+            try:
+                if health_ani + health >= 100:
+                    health = abs(100 - health_ani)
+            except TypeError:
+                return "Unable to restock. You don't own an animal!"
 
             connection.execute(sqlalchemy.text("""INSERT INTO transactions (user_id, gold, animal_id, health, description) 
                                                VALUES (:user_id, -:gold, :animal_id, :health, :description)"""),
@@ -65,8 +75,8 @@ def restock(user_id: int, gold: int):
                                                    "animal_id": animal_id, "health": health, 
                                                    "description": "restore health"}])
 
-        except IntegrityError:
-            return "INTEGRITY ERROR!"
+        except IntegrityError or TypeError:
+            return "User not found"
 
 
     return f"restored {health} health with {gold} gold" # gold spent, health restored

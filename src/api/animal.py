@@ -11,12 +11,27 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
-@router.post("/create-animal/{name}")
+@router.post("/create-animal/")
 def create_animal(animal_name: str, attack: int, defense: int):
     # create an animal with animal name, attack and defense
     # price is equal to sum of the stats
+    try:
+        if int(animal_name):
+            return "Please name an animal with the alphabet."
+    except ValueError:
+        print("Caught ValueError")
+    if attack <= 0 or defense <= 0 or attack > 80 or defense > 80:
+        return "Please try again. Your inputs are not matching up with the required: 1. Defense and attack must be from 1 through 50. 2. Make sure the name of the animal is unique and isn't a number."
 
     with db.engine.begin() as connection:
+        # check if animal name exists already before
+        try:
+            connection.execute(sqlalchemy.text("SELECT COALESCE(name, '-1') FROM animals WHERE UPPER(name) LIKE UPPER(:name)"), {"name": animal_name}).fetchone()[0]
+        except TypeError:
+            print("Animal is unique")
+        else:
+            return "Please try again. This name has been used for an animal already."
+        
         animal_id = connection.execute(sqlalchemy.text("""INSERT INTO animals (name, attack, defense, price) 
                                            VALUES (:animal_name, :attack, :defense, :price) RETURNING animal_id"""), 
                                            [{"animal_name": animal_name, "attack": attack,
@@ -32,8 +47,8 @@ def create_animal(animal_name: str, attack: int, defense: int):
     return f"created animal id {animal_id}: {animal_name}, {attack}, {defense}" # animal_id
 
 
-@router.post("/buy-animal/{animal_name}")
-def buy_animal(animal_id: int, animal_name: str, user_id: int):
+@router.post("/buy-animal/")
+def buy_animal(animal_id: int, user_id: int):
     status = False
     with db.engine.begin() as connection:
         try:
@@ -41,28 +56,25 @@ def buy_animal(animal_id: int, animal_name: str, user_id: int):
             user = connection.execute(sqlalchemy.text("SELECT SUM(gold) AS gold FROM transactions WHERE user_id = :user_id"), [{"user_id": user_id}]).one()
             
             # find price of animal
-            animal = connection.execute(sqlalchemy.text("SELECT user_id, price FROM animals WHERE animal_id = :animal_id"), [{"animal_id": animal_id}]).one()
+            animal = connection.execute(sqlalchemy.text("SELECT in_use, price FROM animals WHERE animal_id = :animal_id"), [{"animal_id": animal_id}]).one()
 
             if user.gold > animal.price:
                 print("user can afford animal")
 
                 # check if unowned
-                if(animal.user_id is None):
+                if(animal.in_use is False):
                     print("animal is available")
                     # check if user already has an animal
                     id = connection.execute(sqlalchemy.text("SELECT animal_id FROM users WHERE user_id = :user_id"), [{"user_id": user_id}]).one()
-                    if id.animal_id is not None:
-                        # if so, unassign the user_id from that animal by setting it to NULL 
-                        # #TODO: cannot assign user_id and animal_id foreign keys to NULL
-
-                        connection.execute(sqlalchemy.text("UPDATE animals SET user_id = NULL WHERE user_id = :user_id"), [{"user_id": user_id}])
-                        
+                    if id.animal_id is not None:                        
                         # and reset animal health to 100 by finding the difference between 100
-                        health = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), [{"animal_id": animal_id}])
+                        health = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), [{"animal_id": id.animal_id}])
+                        prev_animal_name = connection.execute(sqlalchemy.text("SELECT name FROM animals WHERE animal_id = :animal_id"), [{"animal_id": id.animal_id}]).one()
                         # and current health and adding that to transations
                         add_back = 100 - int(health.fetchone()[0])
-                        description = "restored health back to 100 for " + animal_name
-                        connection.execute(sqlalchemy.text("INSERT INTO transactions (animal_id, health, description) VALUES (:animal_id, :add_back, :description)"), [{"animal_id": animal_id, "add_back": add_back, "description": description}]) 
+                        description = "restored health back to 100 for " + prev_animal_name.name
+                        connection.execute(sqlalchemy.text("INSERT INTO transactions (animal_id, health, description) VALUES (:animal_id, :add_back, :description)"), [{"animal_id": id.animal_id, "add_back": add_back, "description": description}]) 
+                        connection.execute(sqlalchemy.text("UPDATE animals SET in_use = False WHERE animal_id = :animal_id"), [{"animal_id": id.animal_id}])
 
                     # insert into transactions 
                     connection.execute(sqlalchemy.text("""INSERT INTO transactions (user_id, gold, description) 
@@ -71,7 +83,8 @@ def buy_animal(animal_id: int, animal_name: str, user_id: int):
 
                     # update animal to user link
                     connection.execute(sqlalchemy.text("UPDATE users SET animal_id = :animal_id WHERE user_id = :user_id"), [{"animal_id": animal_id, "user_id": user_id}])
-                    connection.execute(sqlalchemy.text("UPDATE animals SET user_id = :user_id WHERE animal_id = :animal_id"), [{"user_id": user_id, "animal_id": animal_id}])
+                    connection.execute(sqlalchemy.text("UPDATE animals SET in_use = True WHERE animal_id = :animal_id"), [{"animal_id": animal_id}])
+
                     status = True
 
         except IntegrityError:

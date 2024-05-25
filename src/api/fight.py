@@ -21,7 +21,7 @@ def create_fight(user_id:int, payment:int):
             return "Cannot fight because you don't have an animal! Buy one at the shop!"
         
         sql_query = """SELECT a.name, u.name, a.attack, a.defense, a.health FROM users u
-                    JOIN animals a ON u.animal_id = a.animal_id AND u.user_id = a.user_id
+                    JOIN animals a ON u.animal_id = a.animal_id
                      WHERE u.user_id = :user_id"""
         animal_name, username, attack, defense, health = connection.execute(sqlalchemy.text(sql_query), {"user_id":user_id}).fetchone()
         
