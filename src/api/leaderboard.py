@@ -13,6 +13,7 @@ router = APIRouter(
 
 @router.get("/")
 def leaderboard():
+    '''Returns a list of all users ranked by gold.'''
     with db.engine.begin() as connection:
         users = connection.execute(sqlalchemy.text("""SELECT users.name, SUM(transactions.gold) AS gold 
                                                         FROM users

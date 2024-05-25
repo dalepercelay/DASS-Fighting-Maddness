@@ -1,19 +1,21 @@
 <h1>API Specification for Group Project:</h1>
 
 **List of API calls:**
+
 1. `Get Catalog of Animals` (all animals available to be bought)
 2. `Create an Animal` (user can create an animal to catalog and get money that way)
 3. `Create User` (id, name, gold, animal, health status for user)
 4. `Buy an Animal` (for one fight at a time)
 5. `Create a Fight` (pay up to 10 gold to fight, gets 0 - 100 chance of winning – higher if higher stats)
-7. `Leaderboard` (after every fight result updates, the leaderboard updates)
-8. `Restock on Resources` (buying health)
+6. `Leaderboard` (after every fight result updates, the leaderboard updates)
+7. `Restock on Resources` (buying health)
 
 **Get Catalog of Animals - GET Method** `/catalog`
 Description: Gets a catalog of all the animals available for purchase. One user can have an animal at a time - when they get the animal, it is removed from catalog by their availability = FALSE.
 Response:
+
 ```
-{ 
+{
 	“id”: “integer”
 	“name”: “string”
 	“attack”: “integer” /* between 1 and 100 */
@@ -25,6 +27,7 @@ Response:
 **Create an Animal - POST Method `/create-animal/{name}`**
 Description: Users can create animals (with given name, stats - we create id)
 Request:
+
 ```
 {
 	“name”: “string”
@@ -32,41 +35,52 @@ Request:
 	"attack": "integer" /* between 1 and 80 */
 }
 ```
+
 Response:
+
 ```
 {
 	"created animal id {animal_id}: {animal_name}, {attack}, {defense}"
 }
 ```
+
 **Create User - POST Method `/create-user/{name}`**
 Description: Given a name, it creates a user which has a starting gold of 200, and no animals for fighting.
 Request:
+
 ```
 {
 	“name”: “string”
 }
 ```
+
 Response:
+
 ```
 {
 	“user_id”: “integer”
 }
 ```
+
 **Buy an Animal - POST Method `/buy-animal/{animal_name}`**
 Description: Buy an animal (if the user has enough gold). Return True if delivery was successful (user had enough gold to buy) otherwise False. (An animal starts with 100 health. If their health gets to 0, they cannot be used by the user anymore)
 Request:
+
 ```
 {
 	“animal_name”: “string”
 	"user_name": "string"
 }
 ```
+
 Response:
+
 ```
 {
 	“delivery-status”: “boolean”
 }
 ```
+
 **Create a Fight - POST Method `/fight/`**
 Description: Everyday, there will be one main fight/battle. Users will pay any amount of gold (basically betting in your luck) in order to participate in the fight. A random enemy will be picked out in the database table called Enemies to fight, and they will have their own respective stats, health, and name.
 
@@ -77,13 +91,16 @@ Winning the fight would allow them to earn money based on how much they choose t
 Additionally, if their animal is too weak (health is less than or equal to 10) because the user hasn't restocked them, they will lose that animal completely so it's important to occassionally check up on the inventory!!
 
 Request:
+
 ```
 {
 	“user_id”: “integer”
 	“payment”: “integer”
 }
 ```
+
 Response:
+
 ```
 {
 	"reward": "integer"
@@ -97,24 +114,29 @@ Response:
 Description: Everyday, the leaderboard would be updated based on the rankings of users with the highest amount of gold
 
 Response: (ordered by number of gold in ascending order)
+
 ```
 {
 	“name”: “string” /* user name */
 	“gold”: “string” /* how much gold the user has */
 }
 ```
+
 **Restock on Resources - POST Method `/restock/`**
 Description: After every fight/battle, the user will need to purchase gold to restock their animal's health accordingly. They will purchase 10 gold for 20 health, 20 gold for 40 health, and 30 gold for 60 health.
 
 The maximum health they can fill up to is back to 100.
 
 Request:
+
 ```
 {
 	“gold”: “integer” /* how much gold invested into health */
 }
 ```
+
 Response:
+
 ```
 {
 	“health”: “integer” /* return updated health (old + updated from gold) */
@@ -124,15 +146,19 @@ Response:
 **Get Inventory - GET Method `/inventory/audit`**
 Description: Retrieve user inventory
 Request:
+
 ```
 {
 	"user_id": “int”
 }
 ```
+
 Response:
+
 ```
 {
 	"gold": "integer"
 	“animal”: “str” (name of animal if it has one, otherwise it will return -1)
 	"health": "integer"
 }
+```

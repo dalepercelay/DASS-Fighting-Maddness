@@ -13,6 +13,8 @@ router = APIRouter(
 
 @router.post("/")
 def create_fight(user_id:int, payment:int):
+    '''Create a fight. If won, reward of 10 gold plus bonus of specified payment * 10. 
+    If fight lost, gold paid is lost as well. Animal can lose health during a fight'''
     with db.engine.begin() as connection:
         # make sure user has an animal before fighting
         animal_id = connection.execute(sqlalchemy.text("SELECT COALESCE(animal_id, -1) FROM users WHERE user_id = :user_id"), {"user_id": user_id})

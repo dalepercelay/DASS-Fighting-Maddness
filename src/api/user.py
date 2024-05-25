@@ -16,6 +16,7 @@ router = APIRouter(
 
 @router.post("/create-user")
 def create_user(name: str):
+    '''Create a user.'''
     # create a user
     with db.engine.begin() as connection:
         try:

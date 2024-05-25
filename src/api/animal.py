@@ -11,8 +11,9 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
-@router.post("/create-animal/")
+@router.post("/create")
 def create_animal(animal_name: str, attack: int, defense: int):
+    '''Create an animal to be listed in the catalog (price = attack + defense).'''
     # create an animal with animal name, attack and defense
     # price is equal to sum of the stats
     try:
@@ -47,8 +48,9 @@ def create_animal(animal_name: str, attack: int, defense: int):
     return f"created animal id {animal_id}: {animal_name}, {attack}, {defense}" # animal_id
 
 
-@router.post("/buy-animal/")
+@router.put("/buy")
 def buy_animal(animal_id: int, user_id: int):
+    '''Buy animal (only if you have enough gold)'''
     status = False
     with db.engine.begin() as connection:
         try:

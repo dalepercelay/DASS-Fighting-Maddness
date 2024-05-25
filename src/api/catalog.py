@@ -6,6 +6,7 @@ from src import database as db
 router = APIRouter()
 @router.get("/catalog", tags=["catalog"])
 def get_catalog():
+    '''Get catalog of all available animals.'''
     try:
         # return the list of all available animals in the catalog
         mylist = []

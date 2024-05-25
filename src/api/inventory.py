@@ -14,6 +14,7 @@ router = APIRouter(
 
 @router.get("/audit")
 def get_inventory(user_id: int):
+    '''Returns the gold of the user, as well as the animal and animal health (if owned).'''
     # query in the actual data    
     try:
         with db.engine.begin() as connection:
@@ -39,6 +40,7 @@ def get_inventory(user_id: int):
 
 @router.get("/restock")
 def restock(user_id: int, gold: int):
+    '''Use gold to restore owned animal's health. 1 gold restores 2 health to a max of 100 health.'''
     #check if user has enough gold
     with db.engine.begin() as connection:
         try:
@@ -48,11 +50,14 @@ def restock(user_id: int, gold: int):
                                                             WHERE user_id = :user_id"""), 
                                                             [{"user_id": user_id}]).one().animal_id
             except sqlalchemy.exc.NoResultFound:
-                return "No user found"
+                return "Unable to restock. You don't own an animal!"
             # find user's gold
             user = connection.execute(sqlalchemy.text("""SELECT SUM(gold) AS gold FROM 
                                                       transactions WHERE user_id = :user_id"""), 
                                                       [{"user_id": user_id}]).one()
+            
+            if gold < 0:
+                return "Can't restore health with negative gold."
 
             health = 0
             if user.gold > gold:

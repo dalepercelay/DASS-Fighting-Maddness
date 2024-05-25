@@ -12,6 +12,7 @@ router = APIRouter(
 
 @router.post("/reset")
 def reset():    
+    '''This endpoint is primarily for debugging and resets all tables and populates example data'''
     with db.engine.begin() as connection:
         sql = ""
         # reset tables
