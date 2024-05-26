@@ -18,14 +18,20 @@ router = APIRouter(
 def create_user(name: str):
     '''Create a user.'''
     # create a user
-    with db.engine.begin() as connection:
-        try:
-            id = connection.execute(sqlalchemy.text("INSERT INTO users (name) VALUES (:name) RETURNING user_id"), [{"name": name}])
+    try:
+        with db.engine.begin() as connection:
+            try:
+                # supabase is set up so that name can only be unique values
+                id = connection.execute(sqlalchemy.text("INSERT INTO users (name) VALUES (:name) RETURNING user_id"), [{"name": name}])
+            except:
+                return "Username is already in use."
+
             user_id = id.fetchone()[0]
             connection.execute(sqlalchemy.text("INSERT INTO transactions (user_id, gold, description) VALUES (:user_id, :gold, :description)"), [{"user_id": user_id, "gold": 200, "description": "starting gold"}])
             print(f"user_id: {user_id}")
-        except IntegrityError:
-            return "INTEGRITY ERROR!"
+    except IntegrityError:
+        return "create user: INTEGRITY ERROR!"
+    
     return f"Successfully created a user: {user_id}"
 
 if __name__ == "__main__":

@@ -18,32 +18,29 @@ def get_inventory(user_id: int):
     # query in the actual data    
     try:
         with db.engine.begin() as connection:
-            ids = connection.execute(sqlalchemy.text("SELECT COALESCE(animal_id, -1) FROM users WHERE user_id = :user_id"), [{"user_id": user_id}])
             try:
-                ids = ids.fetchone()[0]
+                ids = connection.execute(sqlalchemy.text("SELECT COALESCE(animal_id, -1) FROM users WHERE user_id = :user_id"), [{"user_id": user_id}]).fetchone()[0]
             except TypeError:
-                return f"user_id of {user_id} doesn't exist"
-            gold = connection.execute(sqlalchemy.text("SELECT SUM(gold) FROM transactions WHERE user_id = :user_id"), [{"user_id": user_id}])
-            gold = gold.fetchone()
+                return f"animal_id of {user_id} doesn't exist"
+            
+            gold = connection.execute(sqlalchemy.text("SELECT SUM(gold) FROM transactions WHERE user_id = :user_id"), [{"user_id": user_id}]).fetchone()
             if ids != -1:
                 # get the animal name
-                animal = connection.execute(sqlalchemy.text("SELECT name FROM animals WHERE animal_id = :animal_id"), [{"animal_id": ids}])
-                animal = animal.fetchone()[0]
-                health = connection.execute(sqlalchemy.text("SELECT COALESCE(SUM(health), 0) FROM transactions WHERE animal_id = :animal_id"), [{"animal_id": ids}])
-                health = health.fetchone()[0]
+                animal = connection.execute(sqlalchemy.text("SELECT name FROM animals WHERE animal_id = :animal_id"), [{"animal_id": ids}]).fetchone()[0]
+                health = connection.execute(sqlalchemy.text("SELECT COALESCE(SUM(health), 0) FROM transactions WHERE animal_id = :animal_id"), [{"animal_id": ids}]).fetchone()[0]
             else:
                 animal = "No animal in inventory"
                 health = "No animal health"
     except IntegrityError:
-        return "INTEGRITY ERROR!"
+        return "get_inventory: INTEGRITY ERROR!"
     return {"gold": gold[0], "animal": animal, "animal health": health}
 
 @router.get("/restock")
 def restock(user_id: int, gold: int):
     '''Use gold to restore owned animal's health. 1 gold restores 2 health to a max of 100 health.'''
     #check if user has enough gold
-    with db.engine.begin() as connection:
-        try:
+    try:
+        with db.engine.begin() as connection:
             # first find out if an animal exists for user
             try:
                 animal_id = connection.execute(sqlalchemy.text("""SELECT animal_id FROM users 
@@ -65,8 +62,7 @@ def restock(user_id: int, gold: int):
                 health = gold * 2
 
             # find out how much health the animal has
-            health_ani = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), {"animal_id": animal_id})
-            health_ani = health_ani.fetchone()[0]
+            health_ani = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), {"animal_id": animal_id}).fetchone()[0]
             # cap max health at 100
             try:
                 if health_ani + health >= 100:
@@ -80,8 +76,8 @@ def restock(user_id: int, gold: int):
                                                    "animal_id": animal_id, "health": health, 
                                                    "description": "restore health"}])
 
-        except IntegrityError or TypeError:
-            return "User not found"
+    except IntegrityError or TypeError:
+        return "restock: User not found"
 
 
     return f"restored {health} health with {gold} gold" # gold spent, health restored

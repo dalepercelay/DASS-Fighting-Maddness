@@ -14,11 +14,14 @@ router = APIRouter(
 @router.get("/")
 def leaderboard():
     '''Returns a list of all users ranked by gold.'''
-    with db.engine.begin() as connection:
-        users = connection.execute(sqlalchemy.text("""SELECT users.name, SUM(transactions.gold) AS gold 
-                                                        FROM users
-                                                        JOIN transactions ON users.user_id = transactions.user_id
-                                                        GROUP BY users.name
-                                                        ORDER BY gold DESC;""")).fetchall()
-
+    try:
+        with db.engine.begin() as connection:
+            users = connection.execute(sqlalchemy.text("""SELECT users.name, SUM(transactions.gold) AS gold 
+                                                            FROM users
+                                                            JOIN transactions ON users.user_id = transactions.user_id
+                                                            GROUP BY users.name
+                                                            ORDER BY gold DESC;""")).fetchall()
+    except IntegrityError:
+        return "leaderboard: INTEGRITY ERROR!"
+    
     return [{"name": user[0], "gold": user[1]} for user in users]

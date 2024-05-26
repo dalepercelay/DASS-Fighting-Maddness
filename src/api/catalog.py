@@ -15,14 +15,14 @@ def get_catalog():
             for animal in animals.fetchall():
                 mylist.append(
                     {
-                        "id": animal[0],
-                        "name": animal[1],
-                        "attack": animal[2],
-                        "defense": animal[3],
-                        "price": animal[4],
+                        "id": animal.animal_id,
+                        "name": animal.name,
+                        "attack": animal.attack,
+                        "defense": animal.defense,
+                        "price": animal.price,
                     }
         )
     except IntegrityError:
-        return "INTEGRITY ERROR!"
+        return "catalog: INTEGRITY ERROR!"
 
     return mylist
