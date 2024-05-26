@@ -27,7 +27,8 @@ def create_user(name: str):
                 return "Username is already in use."
 
             user_id = id.fetchone()[0]
-            connection.execute(sqlalchemy.text("INSERT INTO transactions (user_id, gold, description) VALUES (:user_id, :gold, :description)"), [{"user_id": user_id, "gold": 200, "description": "starting gold"}])
+            connection.execute(sqlalchemy.text("INSERT INTO transactions (user_id, gold, description) VALUES (:user_id, :gold, :description)"), 
+                               [{"user_id": user_id, "gold": 200, "description": "starting gold"}])
             print(f"user_id: {user_id}")
     except IntegrityError:
         return "create user: INTEGRITY ERROR!"
