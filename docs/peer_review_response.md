@@ -36,7 +36,10 @@
 * We have fixed it where we only accept user_id in the API_Specs
 
 <h3>Ryan</h3>
-1. Be consistent with using the same data types
+1
+2
+
+1 Be consistent with using the same data types
 * We have fixed all ids to be int8 but we decided to keep other values such as health, attack, and defense as int4
 2. To Normalize data, add another table like animal_types
 * Animals are all unique at the moment (no type/species) so they only have a name. 
