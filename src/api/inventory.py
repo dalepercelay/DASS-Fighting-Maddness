@@ -13,41 +13,52 @@ router = APIRouter(
 )
 
 # fix where it shows all animals and their respective healths
-@router.get("/audit")
+@router.get("/inventory")
 def get_inventory(user_id: int):
     '''Returns the gold of the user, as well as the animal and animal health (if owned).'''
     # query in the actual data    
     try:
         with db.engine.begin() as connection:
-            ids = connection.execute(sqlalchemy.text("SELECT animal_id FROM users WHERE user_id = :user_id"), [{"user_id": user_id}]).fetchone()[0]
+            ids = connection.execute(sqlalchemy.text("SELECT animal_id FROM animals_owned WHERE user_id = :user_id"), [{"user_id": user_id}])
+            animal_ids = []
             if ids is None:
                 return f"animal_id of {user_id} doesn't exist"
-            
-            gold = connection.execute(sqlalchemy.text("SELECT SUM(gold) FROM transactions WHERE user_id = :user_id"), [{"user_id": user_id}]).fetchone()
-            if ids != -1:
-                # get the animal name
-                animal = connection.execute(sqlalchemy.text("SELECT name FROM animals WHERE animal_id = :animal_id"), [{"animal_id": ids}]).fetchone()[0]
-                health = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), [{"animal_id": ids}]).fetchone()[0]
             else:
-                animal = "No animal in inventory"
-                health = "No animal health"
+                for id in ids:
+                    animal_ids.append(id.animal_id)
+
+            animals = []
+            gold = connection.execute(sqlalchemy.text("SELECT SUM(gold) AS total_gold FROM transactions WHERE user_id = :user_id"), [{"user_id": user_id}]).fetchone()
+            if len(animal_ids) > 0:
+                for i in animal_ids:
+                    # get the animal name
+                    animal = connection.execute(sqlalchemy.text("SELECT name FROM animals WHERE animal_id = :animal_id"), [{"animal_id": i}]).fetchone()[0]
+                    health = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), [{"animal_id": i}]).fetchone()[0]
+                    animals.append({"animal_id": i, "animal_name": animal, "health": health})
+            else:
+                animals = "No animal in inventory"
+                # animal = "No animal in inventory"
+                # health = "No animal health"
     except IntegrityError:
         return "get_inventory: INTEGRITY ERROR!"
-    return {"gold": gold[0], "animal": animal, "animal health": health}
+    return {"gold": gold.total_gold, "animals": animals}
 
 
 # fix where you can pick to restock which animal
-@router.get("/restock")
-def restock(user_id: int, animal_id: int, gold: int):
+@router.get("/restore")
+def restore_health(user_id: int, animal_id: int, gold: int):
     '''Use gold to restore owned animal's health. 1 gold restores 2 health to a max of 100 health.'''
     #check if user has enough gold
     try:
         with db.engine.begin() as connection:
             # first find out if an animal exists for user
             try:
-                animal_id = connection.execute(sqlalchemy.text("""SELECT animal_id FROM users 
-                                                            WHERE user_id = :user_id"""), 
-                                                            [{"user_id": user_id}]).one().animal_id
+                animal_id_result = connection.execute(sqlalchemy.text("""SELECT animal_id FROM animals_owned 
+                                                            WHERE user_id = :user_id 
+                                                               AND animal_id = :animal_id"""), 
+                                                            [{"user_id": user_id, "animal_id": animal_id}]).fetchone().animal_id
+                if animal_id_result is not None:
+                    print("User owns animal, able to heal")
             except sqlalchemy.exc.NoResultFound:
                 return "Unable to restock. You don't own an animal!"
             # find user's gold
@@ -64,7 +75,7 @@ def restock(user_id: int, animal_id: int, gold: int):
                 health = gold * 2
 
             # find out how much health the animal has
-            health_ani = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), {"animal_id": animal_id}).fetchone()[0]
+            health_ani = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), {"animal_id": animal_id_result}).fetchone()[0]
             # cap max health at 100
             try:
                 if health_ani + health >= 100:
