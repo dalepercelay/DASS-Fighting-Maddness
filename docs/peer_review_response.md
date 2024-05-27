@@ -64,7 +64,7 @@
 13. When executing Restock after an animal has no health gold is still removed even though you can't restock health at that point but it shouldn't take gold.
 * Made it so that a user can’t use negative gold to take away health. When an animal has no health you can still restock health (it isn’t dead, just tired…)
 
-#Joshua
+<h3>Joshua</h3>
 
 1. Change /create-users to just /users as a POST call implies creating a user.
 * It does imply this, but we think it’s more clear to just keep it as create when creating entities since we also have buy-animal.
@@ -91,7 +91,7 @@
 12. In the fights table, the foreign keys should not be nullable
 * We have fixed that. We disabled the allow nullable option for our table
 
-#Calvin
+<h3>Calvin</h3>
 
 1. Users and Animals currently have a circular dependency, so the current schema.sql file can't be run as is.
 * We have fixed that
@@ -118,7 +118,7 @@
 12. The foreign keys in fights should not be nullable.
 * We have fixed that. We disabled the allow nullable option for our table
 
-#Kyle
+<h3>Kyle</h3>
 
 1. Evaluate if foreign key columns should be nullable
 * We have fixed that. We disabled the allow nullable option for our table
@@ -146,9 +146,9 @@
 * But the fight table will never have null values because we only fill them in whenever a user with an animal fights with an enemy and an enemy is always present and a user is always required to have an animal before fighting. We also made it non nullable.
 
 
-##CODE
+<h2>CODE</h2>
 
-#Victoria
+<h3>Victoria</h3>
 
 1. For admin/reset, it's a good idea to check what you're deleting before you truncate everything: Here
 * Decided don’t need to check what I am deleting because I want to clear everything for debugging purposes.
@@ -183,7 +183,7 @@
 16. You may want to change this to >= instead of >, because users may see they have just enough gold to purchase an animal but it wouldn't allow them to as is. Here
 * We have changed it.
 
-#Ryan
+<h3>Ryan</h3>
 
 1. .env file should be hidden.
 * Done. 
@@ -210,7 +210,7 @@
 12. Here the with block could be cleaned up to avoid redundant code.
 * We have cleaned this up.
 
-#Joshua
+<h3>Joshua</h3>
 
 1. In reset() in admin.py it seems unnecessary to incrementally add to a 'sql' string instead of initializing the string all at once.
 * We did it for readability but we understand how it looks redundant.
@@ -239,7 +239,7 @@
 13. In buy_animal() users should be able to buy the animal if they have exactly the amount of gold needed. Right now the user needs to have gold strictly greater than the price.
 * We have changed this.
 
-#Kyle
+<h3>Kyle</h3>
 
 1. .env is accessible and anyone can access the endpoints/database. Can modify db to do whatever
 * Deleted it from git.
@@ -283,7 +283,7 @@ user_id: int
 16. Perhaps have an optional id field for leaderboard or inventory with an id field
 * We decided to stick with what we have because we think it makes more sense that way.
 
-#Calvin
+<h3>Calvin</h3>
 
 1. Should remove the .env from the repo, and instead add those environment variables to the render dashboard directly for security reasons.
 * Have removed .env, env variables are already in the render dashboard.
