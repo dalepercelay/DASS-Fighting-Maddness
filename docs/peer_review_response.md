@@ -37,7 +37,7 @@
 
 <h3>Ryan</h3>
 
-1 Be consistent with using the same data types
+1. Be consistent with using the same data types
 * We have fixed all ids to be int8 but we decided to keep other values such as health, attack, and defense as int4
 2. To Normalize data, add another table like animal_types
 * Animals are all unique at the moment (no type/species) so they only have a name. 
@@ -65,175 +65,185 @@
 * Made it so that a user can’t use negative gold to take away health. When an animal has no health you can still restock health (it isn’t dead, just tired…)
 
 #Joshua
-Change /create-users to just /users as a POST call implies creating a user.
-It does imply this, but we think it’s more clear to just keep it as create when creating entities since we also have buy-animal.
-Change /animal/create-animal/{name} to just /animal/{name}.
-Same as above
-Change /animal/buy-animal/{animal_name} to just /animal/buy/{animal_name}
-Same as above
-animals table references users table but users table also references animals table - may cause circular dependency problem
-Yes, but it’s easier for us to access the information about animal_id from create fight and easier for us to access the information about the user from animal to associate ownership even if a little redundant. Since the field can be nullable, we don’t see any issues even if it’s circular because they aren’t dependent.
-API spec for /create-animal has price field in the request json that isn't in implementation
-We have removed the price field in API Spec so it is consistent now
-API spec for /create-animal has constraints on defense and attack values (1-50) but I was able to create animals that do not meet these constraints.
-We have fixed the defense and attack value constraints
-In the API spec for /create-animal the response json doesn't match the actual response json
-Fixed API
-/create-animal does not take gold from user right now - API spec says it should
-Fixed API
-In the API spec for /buy-animal, 'animal_name' does not need to be in both the url path and request json.
-We have removed {animal_name} in the path
-/restock endpoint throwing server error when user does not have an animal
-We have fixed that now so it returns a message instead
-API Spec specifies /audit request input as username but the implementation requires user_id not username
-We have fixed the API Spec to match our code
-In the fights table, the foreign keys should not be nullable
-We have fixed that. We disabled the allow nullable option for our table
+
+1. Change /create-users to just /users as a POST call implies creating a user.
+* It does imply this, but we think it’s more clear to just keep it as create when creating entities since we also have buy-animal.
+2. Change /animal/create-animal/{name} to just /animal/{name}.
+* Same as above
+3. Change /animal/buy-animal/{animal_name} to just /animal/buy/{animal_name}
+* Same as above
+4. animals table references users table but users table also references animals table - may cause circular dependency problem
+* Yes, but it’s easier for us to access the information about animal_id from create fight and easier for us to access the information about the user from animal to associate ownership even if a little redundant. Since the field can be nullable, we don’t see any issues even if it’s circular because they aren’t dependent.
+5. API spec for /create-animal has price field in the request json that isn't in implementation
+* We have removed the price field in API Spec so it is consistent now
+6. API spec for /create-animal has constraints on defense and attack values (1-50) but I was able to create animals that do not meet these constraints.
+* We have fixed the defense and attack value constraints
+7. In the API spec for /create-animal the response json doesn't match the actual response json
+* Fixed API
+8. /create-animal does not take gold from user right now - API spec says it should
+* Fixed API
+9. In the API spec for /buy-animal, 'animal_name' does not need to be in both the url path and request json.
+* We have removed {animal_name} in the path
+10. /restock endpoint throwing server error when user does not have an animal
+* We have fixed that now so it returns a message instead
+11. API Spec specifies /audit request input as username but the implementation requires user_id not username
+* We have fixed the API Spec to match our code
+12. In the fights table, the foreign keys should not be nullable
+* We have fixed that. We disabled the allow nullable option for our table
 
 #Calvin
-Users and Animals currently have a circular dependency, so the current schema.sql file can't be run as is.
-It would make sense to allow users to have multiple animals.
-Our implementation at the moment only allows for one.
-/create-animal/{name} and /buy-animal/{animal_name} can both be /animals, but the create endpoint would be a POST and the buy endpoint would be a PUT.
-Made them post/put methods with /animal/create and /animal/buy.
-/create-user can just be called /users, the create part is inferred by it being a POST method.
-Enemies and Animals tables both seem extremely similar, might make it simpler to keep track of enemies as animals.
- We would like to keep them distinct so that users would not be able to buy animals. Also enemies are presets that we make.
-Primary id keys can just be called "id".
-Easier for us to keep track of id since we have so many different ids. (more consistent)
-Could enforce name uniqueness on Users and Animals.
-I set it to be unique in Supabase. Both animals and users code check if it is unique and returns an error if not.
-Could potentially use name as the primary key for Users and Animals.
-We would like to keep the id as an index.
-The outcome column in fights could be a boolean instead of just being a text, that way you could do stuff like count total wins for a given User/Enemy.
-Changed outcome column to be bool and fixed it in code.
-I don't think there is much need for a /reset endpoint.
-We will remove it because it was mainly for us to test it on our end.
-There should be 2 separate tables to keep track of money changes for users and health changes for animals respectively.
-Since our inventory is based on both gold and health, we thought it would be better to have it all on the same table because you can restock health using gold.
-The foreign keys in fights should not be nullable.
-We have fixed that. We disabled the allow nullable option for our table
+
+1. Users and Animals currently have a circular dependency, so the current schema.sql file can't be run as is.
+* We have fixed that
+2. It would make sense to allow users to have multiple animals.
+* We have changed it now
+3. /create-animal/{name} and /buy-animal/{animal_name} can both be /animals, but the create endpoint would be a POST and the buy endpoint would be a PUT.
+* Made them post/put methods with /animal/create and /animal/buy.
+4. /create-user can just be called /users, the create part is inferred by it being a POST method.
+* Fixed
+5. Enemies and Animals tables both seem extremely similar, might make it simpler to keep track of enemies as animals.
+* We would like to keep them distinct so that users would not be able to buy animals. Also enemies are presets that we make.
+6. Primary id keys can just be called "id".
+* Easier for us to keep track of id since we have so many different ids. (more consistent)
+7. Could enforce name uniqueness on Users and Animals.
+* I set it to be unique in Supabase. Both animals and users code check if it is unique and returns an error if not.
+8. Could potentially use name as the primary key for Users and Animals.
+* We would like to keep the id as an index.
+9. The outcome column in fights could be a boolean instead of just being a text, that way you could do stuff like count total wins for a given User/Enemy.
+* Changed outcome column to be bool and fixed it in code.
+10. I don't think there is much need for a /reset endpoint.
+* We will remove it because it was mainly for us to test it on our end.
+11. There should be 2 separate tables to keep track of money changes for users and health changes for animals respectively.
+* Since our inventory is based on both gold and health, we thought it would be better to have it all on the same table because you can restock health using gold.
+12. The foreign keys in fights should not be nullable.
+* We have fixed that. We disabled the allow nullable option for our table
 
 #Kyle
-Evaluate if foreign key columns should be nullable
-We have fixed that. We disabled the allow nullable option for our table
-Add indexes to improve query performance
-We have a lot of indexes already so we think our query performance should be okay with the tradeoff between index and speed.
-Ensure default values are appropriate or set them explicitly where necessary.
-We have done so.
-Use more appropriate data types like varchar(n) with length constraints for better performance and validation instead of text()
-Most descriptions have varying lengths and are dependent on the length of names, so we can’t set a constraint. We set constraints on user name or animal name to be 20 char.
-Use a consistent naming convention, such as snake_case for all columns and tables
-We are using a consistent naming convention
-Add constraints on the table so malformed data doesn't get input
-We have fixed that.
-Ensure timestamps reflect the correct time zone or use UTC for consistency
-All of the timestamps have been consistent with now(). But in the end, we set all timezones to UTC.
-Check if composite keys would better represent transactions
-It’s easier for us to have a transaction_id. Also, we need it for our fights because if our user fights with the same animal with the same enemy, then the transaction id would be required.
-Implement cascading deletes
-Deleting all the tables at once is fine for reset and is only for debugging.
-Users can only have one animal at the moment
-It is intended at the moment.
-Perhaps add a table that merges users and animals together
-It is alright because we will just use the user to find the associated animal, and the animal doesn’t need to know its owner, just that it is owned.
-Fight table can get messed up if there's null values or non cascading data deletion
-But the fight table will never have null values because we only fill them in whenever a user with an animal fights with an enemy and an enemy is always present and a user is always required to have an animal before fighting. We also made it non nullable.
+
+1. Evaluate if foreign key columns should be nullable
+* We have fixed that. We disabled the allow nullable option for our table
+2. Add indexes to improve query performance
+* We have a lot of indexes already so we think our query performance should be okay with the tradeoff between index and speed.
+3. Ensure default values are appropriate or set them explicitly where necessary.
+* We have done so.
+4. Use more appropriate data types like varchar(n) with length constraints for better performance and validation instead of text()
+* Most descriptions have varying lengths and are dependent on the length of names, so we can’t set a constraint. We set constraints on user name or animal name to be 20 char.
+5. Use a consistent naming convention, such as snake_case for all columns and tables
+* We are using a consistent naming convention
+6. Add constraints on the table so malformed data doesn't get input
+* We have fixed that.
+7. Ensure timestamps reflect the correct time zone or use UTC for consistency
+* All of the timestamps have been consistent with now(). But in the end, we set all timezones to UTC.
+8. Check if composite keys would better represent transactions
+* It’s easier for us to have a transaction_id. Also, we need it for our fights because if our user fights with the same animal with the same enemy, then the transaction id would be required.
+9. Implement cascading deletes
+* Deleting all the tables at once is fine for reset and is only for debugging.
+10. Users can only have one animal at the moment
+* We have fixed that.
+11. Perhaps add a table that merges users and animals together
+* It is alright because we will just use the user to find the associated animal, and the animal doesn’t need to know its owner, just that it is owned.
+12. Fight table can get messed up if there's null values or non cascading data deletion
+* But the fight table will never have null values because we only fill them in whenever a user with an animal fights with an enemy and an enemy is always present and a user is always required to have an animal before fighting. We also made it non nullable.
 
 
 ##CODE
+
 #Victoria
-For admin/reset, it's a good idea to check what you're deleting before you truncate everything: Here
-Decided don’t need to check what I am deleting because I want to clear everything for debugging purposes.
-Have your try statements before the with statement in case the database connection fails.
-Moved all try statements to nest with statements within.
-It seems like you're returning one animal id here and then trying to grab it's id. I'm unsure if this works, but I'd suggest returning a scalar() instead if you're trying to grab one integer value. Here
-Scalar is for aggregate, we used .one()
-You may also want to use .scalar() here to get the sum of the ledger. Here
-It still works so we don’t want to change it.
-In the same line as above, you index through a cursor result. I'd suggest naming each column returned by the cursor result and traversing it by name instead of index.
-Removed use of indices in this line.
-This line may create opening for injections, try using parameter binding: Here
-Used database data instead of user inputted data.
-Name columns instead of indexing through cursor result: Here
-Changed it to name column instead of index.
-You can combine these statements by adding fetchone() or first() to the query itself. This would reduce redundancy and possibilities of error: Here
-Another idea here is to combine queries, like when finding health and gold.
-We combined fetchone to the query itself. Since animal and user are not necessarily the same at all times, it’s easier to keep these queries separate.
-.env file seems to be fully accessible. This is bad practice, as it allows anyone with access to the database/endpoints to do anything with that information.
-We deleted the .env file from github and will change the API key.
-Finish get inventory endpoint. It shows up in the docs but has no functionality
-This endpoint is in the inventory, but under a different name to make it more clear now.
-Could improve error handling to return specific errors depending on the endpoint
-We added names to the integrity errors specifying the endpoint.
-"from src.api import auth" make sure to import auth in your api sources for dependencies, and I'd suggest adding dependencies so that your endpoints are protected
-We do import auth in all of our endpoints except for catalog.
-Could reduce use of magic numbers by adding variables or comments with explanations.
-Added variables that explain magic numbers.
-Should add logic in the fight endpoint in case of a tie.
-Maybe just pass in animal_id here for simplification and to reduce errors if name, id pair is entered incorrectly: Here
-We have changed it now.
-You may want to change this to >= instead of >, because users may see they have just enough gold to purchase an animal but it wouldn't allow them to as is. Here
-Changed this.
+
+1. For admin/reset, it's a good idea to check what you're deleting before you truncate everything: Here
+* Decided don’t need to check what I am deleting because I want to clear everything for debugging purposes.
+2. Have your try statements before the with statement in case the database connection fails.
+* Moved all try statements to nest with statements within.
+3. It seems like you're returning one animal id here and then trying to grab it's id. I'm unsure if this works, but I'd suggest returning a scalar() instead if you're trying to grab one integer value. Here
+* Scalar is for aggregate, we used .one()
+4. You may also want to use .scalar() here to get the sum of the ledger. Here
+* It still works so we don’t want to change it.
+5. In the same line as above, you index through a cursor result. I'd suggest naming each column returned by the cursor result and traversing it by name instead of index.
+* Removed use of indices in this line.
+6. This line may create opening for injections, try using parameter binding: Here
+* Used database data instead of user inputted data.
+7. Name columns instead of indexing through cursor result: Here
+* Changed it to name column instead of index.
+8. You can combine these statements by adding fetchone() or first() to the query itself. This would reduce redundancy and possibilities of error: Here Another idea here is to combine queries, like when finding health and gold.
+* We combined fetchone to the query itself. Since animal and user are not necessarily the same at all times, it’s easier to keep these queries separate.
+9. .env file seems to be fully accessible. This is bad practice, as it allows anyone with access to the database/endpoints to do anything with that information.
+* We deleted the .env file from github and will change the API key.
+10. Finish get inventory endpoint. It shows up in the docs but has no functionality
+* This endpoint is in the inventory, but under a different name to make it more clear now.
+11. Could improve error handling to return specific errors depending on the endpoint
+* We added names to the integrity errors specifying the endpoint.
+12. "from src.api import auth" make sure to import auth in your api sources for dependencies, and I'd suggest adding dependencies so that your endpoints are protected
+* We do import auth in all of our endpoints except for catalog.
+13. Could reduce use of magic numbers by adding variables or comments with explanations.
+* Added variables that explain magic numbers.
+14. Should add logic in the fight endpoint in case of a tie.
+* We have decided to keep it simple for now and just let users win if they have greater or equal health than the enemy.
+15. Maybe just pass in animal_id here for simplification and to reduce errors if name, id pair is entered incorrectly: Here
+* We have changed it now.
+16. You may want to change this to >= instead of >, because users may see they have just enough gold to purchase an animal but it wouldn't allow them to as is. Here
+* We have changed it.
 
 #Ryan
-.env file should be hidden.
-Done. 
-Here a try error exception could be added to handle potential errors.
-Added try error exception outside all with connection blocks.
-Here the try exception should be placed outside the with block.
-Done. 
-Here animal query could be used to filter more to clean up code.
-We changed this code entirely to add an in_use column.
-Here the name parameter wasn't used.
-We have now removed the name parameter
-Here if the user has the exact gold they won't be able to make the purchase.
-Changed this.
-Here for better readability, don't access the cursor result through indexing
-Changed this.
-Here for improved readability, assign results to variables to read code better.
-Changed this.
-Here there are many magic numbers being used, which could be improved by using named variables.
-Added named variables such as min_damage.
-Here use named parameters for better readability.
-Don’t use indices anymore.
-Here there could be a better error message to be more informative.
-Specified which endpoint this error occurred in.
-Here the with block could be cleaned up to avoid redundant code.
-Cleaned this up.
+
+1. .env file should be hidden.
+* Done. 
+2. Here a try error exception could be added to handle potential errors.
+* Added try error exception outside all with connection blocks.
+3. Here the try exception should be placed outside the with block.
+* Done. 
+4. Here animal query could be used to filter more to clean up code.
+* We changed this code entirely to add an in_use column.
+5. Here the name parameter wasn't used.
+* We have now removed the name parameter
+6. Here if the user has the exact gold they won't be able to make the purchase.
+* We have changed this.
+7. Here for better readability, don't access the cursor result through indexing
+* Changed this.
+8. Here for improved readability, assign results to variables to read code better.
+* Changed this.
+9. Here there are many magic numbers being used, which could be improved by using named variables.
+* Added named variables such as min_damage.
+10. Here use named parameters for better readability.
+* Don’t use indices anymore.
+11. Here there could be a better error message to be more informative.
+* Specified which endpoint this error occurred in.
+12. Here the with block could be cleaned up to avoid redundant code.
+* We have cleaned this up.
 
 #Joshua
-In reset() in admin.py it seems unnecessary to incrementally add to a 'sql' string instead of initializing the string all at once.
-We did it for readability but we understand how it looks redundant.
-In create_animal(), the url path variable {name} is not being used, instead the query variable 'animal_name' is being used. Maybe change this to use just the path variable.
-We do not have a url path variable anymore.
-In buy_animal() you shouldn't have to provide both animal_id and animal_name (what if they don't match).
-Now, only need to provide animal_id.
-In get_catalog() it is better to directly use the result fields of animals (animal.animal_id, animal.name, etc) instead of using the numerical indexes.
-Use fields instead of indexes.
-In create_fights() you are also using numerical indexes for enemy_result.
-Using fields instead of indexes.
-In create_fights() there are a lot of magic numbers that should probably be defined as constants at the top of the file.
-We define these magic numbers as variables.
-In get_inventory(), if the user has no animal it shows up as animal:-1 where it probably should say None, and animal health is null.
-We have changed it where we have put up replacement messages instead.
-In get_inventory() the gold and health queries can be combined into one
-Since animal and user do not have to be linked together forever (user can get a new animal), we think it’s simpler to leave them separate because the SUM  is not necessarily only for when both are together.
-In get_inventory() getting the animal_id and then the animal name can be combined into one query with a JOIN between the two tables
-Simpler to just keep them unjoined.
-In leaderboard() you are using numerical indexes for users result (should use users.name, users.gold)
-Changed to using fields.
-In create_fights() there is no logic handling if the fight ends in a tie - where healths are equal.
-We are currently keeping the game simple, and so in the code we have stated that as long as the user has more or equal health than the enemy, then they are declared as the winner.
-.env file should not be checked into git.
-Deleted it from git.
-In buy_animal() users should be able to buy the animal if they have exactly the amount of gold needed. Right now the user needs to have gold strictly greater than the price.
-Changed this.
+
+1. In reset() in admin.py it seems unnecessary to incrementally add to a 'sql' string instead of initializing the string all at once.
+* We did it for readability but we understand how it looks redundant.
+2. In create_animal(), the url path variable {name} is not being used, instead the query variable 'animal_name' is being used. Maybe change this to use just the path variable.
+* We do not have a url path variable anymore.
+3. In buy_animal() you shouldn't have to provide both animal_id and animal_name (what if they don't match).
+* Now, we only need to provide animal_id.
+4. In get_catalog() it is better to directly use the result fields of animals (animal.animal_id, animal.name, etc) instead of using the numerical indexes.
+* Use fields instead of indexes.
+5. In create_fights() you are also using numerical indexes for enemy_result.
+* Using fields instead of indexes.
+6. In create_fights() there are a lot of magic numbers that should probably be defined as constants at the top of the file.
+* We defined these magic numbers as variables.
+7. In get_inventory(), if the user has no animal it shows up as animal:-1 where it probably should say None, and animal health is null.
+* We have changed it where we have put up replacement messages instead.
+8. In get_inventory() the gold and health queries can be combined into one
+* Since animal and user do not have to be linked together forever (user can get a new animal), we think it’s simpler to leave them separate because the SUM  is not necessarily only for when both are together.
+9. In get_inventory() getting the animal_id and then the animal name can be combined into one query with a JOIN between the two tables
+* Simpler to just keep them unjoined.
+10. In leaderboard() you are using numerical indexes for users result (should use users.name, users.gold)
+* Changed to using fields.
+11. In create_fights() there is no logic handling if the fight ends in a tie - where healths are equal.
+* We are currently keeping the game simple, and so in the code we have stated that as long as the user has more or equal health than the enemy, then they are declared as the winner.
+12. .env file should not be checked into git.
+* Deleted it from git.
+13. In buy_animal() users should be able to buy the animal if they have exactly the amount of gold needed. Right now the user needs to have gold strictly greater than the price.
+* We have changed this.
 
 #Kyle
-.env is accessible and anyone can access the endpoints/database. Can modify db to do whatever
-Deleted it from git.
-Use pydantic models
+
+1. .env is accessible and anyone can access the endpoints/database. Can modify db to do whatever
+* Deleted it from git.
+2. Use pydantic models
 for example
 class AnimalCreateRequest(BaseModel):
 name: str
@@ -243,58 +253,59 @@ class AnimalBuyRequest(BaseModel):
 animal_id: int
 animal_name: str
 user_id: int
-We have decided to stick with our own thing instead because it is easier for us to understand.
-Get inventory shows up but doesn't have functionality
-Have changed this to be in an inventory file with functionality instead of users.
-Use of magic numbers is quite high
-Used variables instead.
-Comprehensive error handling would help
-Add error messages for common errors.
-Add a testing suite
-We have created and tested many different situations
-Add connection rollbacks on cases with errors
-We just try and if it doesn’t work out, return an integrity error. Also, before we insert or update data, we make sure to put case checks beforehand so it’s guaranteed that there will be no mistakes in adding data.
-Return as user_id in json format so the user can extract.
-We have fixed that.
-/inventory/restock endpoint just leads to internal service errors when running
-Fixed it to actually work
-I don't know how much gold I have as a user
-You can check in the inventory.py
-Not sure why this takes animal_name
-We have fixed that now.
-Have more consistent output on fight. Perhaps something like "who won or lost always instead of string with "animal too injured..."
-We did.
-Are able to create animals with negative stats
-We have fixed that.
-Able to buy animals with negative stats which leads to you getting more gold. Infinite gold glitch. 
-Have set bounds to values you can input for these fields.
-Reset probably shouldn't be a thing
-It was for us testing it but we will comment it out later.
-Perhaps have an optional id field for leaderboard or inventory with an id field
-We decided to stick with what we have because we think it makes more sense that way.
+* We have decided to stick with our own thing instead because it is easier for us to understand.
+3. Get inventory shows up but doesn't have functionality
+* Have changed this to be in an inventory file with functionality instead of users.
+4. Use of magic numbers is quite high
+* Used variables instead.
+5. Comprehensive error handling would help
+* Add error messages for common errors.
+6. Add a testing suite
+* We have created and tested many different situations
+7. Add connection rollbacks on cases with errors
+* We just try and if it doesn’t work out, return an integrity error. Also, before we insert or update data, we make sure to put case checks beforehand so it’s guaranteed that there will be no mistakes in adding data.
+8. Return as user_id in json format so the user can extract.
+* We have fixed that.
+9. /inventory/restock endpoint just leads to internal service errors when running
+* Fixed it to actually work
+10. I don't know how much gold I have as a user
+* You can check in the inventory.py
+11. Not sure why this takes animal_name
+* We have fixed that now.
+12. Have more consistent output on fight. Perhaps something like "who won or lost always instead of string with "animal too injured..."
+* We did.
+13. Are able to create animals with negative stats
+* We have fixed that.
+14. Able to buy animals with negative stats which leads to you getting more gold. Infinite gold glitch. 
+* Have set bounds to values you can input for these fields.
+15. Reset probably shouldn't be a thing
+* It was for us testing it but we will comment it out later.
+16. Perhaps have an optional id field for leaderboard or inventory with an id field
+* We decided to stick with what we have because we think it makes more sense that way.
 
 #Calvin
-Should remove the .env from the repo, and instead add those environment variables to the render dashboard directly for security reasons.
-Have removed .env, env variables are already in the render dashboard.
-Would recommend using an ORM to speed up development and avoid type errors.
-We are using SQLAlchemy.
-In the buy animal endpoint, should specify in the query to only return unowned animals, rather than querying all animals and then filtering in the endpoint.
-It only returns animals without a user currently, we have an in_use column and filter off of that.
-Can change error handling to return/print the actual error.
-We have fixed that
-Would make more sense to use a normal select statement, and then check if none is returned rather than using COALESCE with -1.
-We have fixed that now. No select statements have COALESCE in them.
-Lots of magic numbers.
-We use variables now.
-URL param in /create-animal/{name} is unused.
-We have fixed that.
-The 1st and 4th sql statements in the /audit endpoint can be combined using a join.
-Easier for us to understand without a join.
-The 2nd and 3rd sql statements in the /audit endpoint can be combined into a single select.
-These statements reference different tables so we would like to keep them separate.
-The current fight logic does not account for ties.
-We are first keeping it simple so we have only made the user win when they have equal or greater amounts of health than the enemy.
-Consider breaking up large sql lines into multiple lines for readability.
-Have broken up lines.
-The buy animal endpoint probably doesn't need to take in the animal_name if the animal_id is already being passed in.
-We have fixed that now.
+
+1. Should remove the .env from the repo, and instead add those environment variables to the render dashboard directly for security reasons.
+* Have removed .env, env variables are already in the render dashboard.
+2. Would recommend using an ORM to speed up development and avoid type errors.
+* We are using SQLAlchemy.
+3. In the buy animal endpoint, should specify in the query to only return unowned animals, rather than querying all animals and then filtering in the endpoint.
+* It only returns animals without a user currently, we have an in_use column and filter off of that.
+4. Can change error handling to return/print the actual error.
+* We have fixed that
+5. Would make more sense to use a normal select statement, and then check if none is returned rather than using COALESCE with -1.
+* We have fixed that now. No select statements have COALESCE in them.
+6. Lots of magic numbers.
+* We use variables now.
+7. URL param in /create-animal/{name} is unused.
+* We have fixed that.
+8. The 1st and 4th sql statements in the /audit endpoint can be combined using a join.
+* Easier for us to understand without a join.
+9. The 2nd and 3rd sql statements in the /audit endpoint can be combined into a single select.
+* These statements reference different tables so we would like to keep them separate.
+10. The current fight logic does not account for ties.
+* We are first keeping it simple so we have only made the user win when they have equal or greater amounts of health than the enemy.
+11. Consider breaking up large sql lines into multiple lines for readability.
+* Have broken up lines.
+12. The buy animal endpoint probably doesn't need to take in the animal_name if the animal_id is already being passed in.
+* We have fixed that now.
