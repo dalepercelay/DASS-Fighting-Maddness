@@ -27,7 +27,7 @@ def create_animal(animal_name: str, attack: int, defense: int):
         with db.engine.begin() as connection:
             # check if animal name exists already before
             try:
-                connection.execute(sqlalchemy.text("SELECT COALESCE(name, '-1') FROM animals WHERE UPPER(name) LIKE UPPER(:name)"), {"name": animal_name}).fetchone()[0]
+                connection.execute(sqlalchemy.text("SELECT name FROM animals WHERE UPPER(name) LIKE UPPER(:name)"), {"name": animal_name}).fetchone()[0]
             except TypeError:
                 print("Animal is unique")
             else:
@@ -55,6 +55,14 @@ def buy_animal(animal_id: int, user_id: int):
     status = False
     try:
         with db.engine.begin() as connection:
+            # check if user and animal actually exist
+            try:
+                connection.execute(sqlalchemy.text("SELECT name FROM users WHERE user_id = :user_id"), 
+                                      [{"user_id": user_id}]).fetchone()[0]
+                connection.execute(sqlalchemy.text("SELECT name FROM animals WHERE animal_id = :animal_id"), 
+                                      [{"animal_id": animal_id}]).fetchone()[0]
+            except TypeError:
+                return "The IDs you provided don't exist"
     
             # find user's gold
             user = connection.execute(sqlalchemy.text("SELECT SUM(gold) AS gold FROM transactions WHERE user_id = :user_id"), 
@@ -101,6 +109,6 @@ def buy_animal(animal_id: int, user_id: int):
                     status = True
 
     except IntegrityError:
-        return "buy animal: INTEGRITY ERROR!"
+        return "Buy Animal: INTEGRITY ERROR!"
     
     return {"delivery_status": status}

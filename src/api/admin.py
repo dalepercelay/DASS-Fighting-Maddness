@@ -39,6 +39,6 @@ def reset():
             connection.execute(sqlalchemy.text(sql))
     
     except IntegrityError:
-        return "admin reset: INTEGRITY ERROR!"
-    return "OK"
+        return "Admin Reset: INTEGRITY ERROR!"
+    return "Successfully reset the databases"
 

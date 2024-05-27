@@ -18,16 +18,15 @@ def get_inventory(user_id: int):
     # query in the actual data    
     try:
         with db.engine.begin() as connection:
-            try:
-                ids = connection.execute(sqlalchemy.text("SELECT COALESCE(animal_id, -1) FROM users WHERE user_id = :user_id"), [{"user_id": user_id}]).fetchone()[0]
-            except TypeError:
+            ids = connection.execute(sqlalchemy.text("SELECT animal_id FROM users WHERE user_id = :user_id"), [{"user_id": user_id}]).fetchone()[0]
+            if ids is None:
                 return f"animal_id of {user_id} doesn't exist"
             
             gold = connection.execute(sqlalchemy.text("SELECT SUM(gold) FROM transactions WHERE user_id = :user_id"), [{"user_id": user_id}]).fetchone()
             if ids != -1:
                 # get the animal name
                 animal = connection.execute(sqlalchemy.text("SELECT name FROM animals WHERE animal_id = :animal_id"), [{"animal_id": ids}]).fetchone()[0]
-                health = connection.execute(sqlalchemy.text("SELECT COALESCE(SUM(health), 0) FROM transactions WHERE animal_id = :animal_id"), [{"animal_id": ids}]).fetchone()[0]
+                health = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), [{"animal_id": ids}]).fetchone()[0]
             else:
                 animal = "No animal in inventory"
                 health = "No animal health"

@@ -18,8 +18,8 @@ def create_fight(user_id:int, payment:int):
     try:
         with db.engine.begin() as connection:
             # make sure user has an animal before fighting
-            animal_id = connection.execute(sqlalchemy.text("SELECT COALESCE(animal_id, -1) FROM users WHERE user_id = :user_id"), {"user_id": user_id}).fetchone()[0]
-            if animal_id == -1:
+            animal_id = connection.execute(sqlalchemy.text("SELECT animal_id FROM users WHERE user_id = :user_id"), {"user_id": user_id}).fetchone()[0]
+            if animal_id is None:
                 return "Cannot fight because you don't have an animal! Buy one at the shop!"
             
             sql_query = """SELECT a.name, u.name, a.attack, a.defense, a.health FROM users u
@@ -66,6 +66,7 @@ def create_fight(user_id:int, payment:int):
 
             health -= total_user_damage
             enemy_health -= total_enemy_damage
+            # even if there is a tie, as long as the user has more or equal health than enemy, then they would be declared as the winner
             if enemy_health>health:
                 winner = enemy_name  
                 # outcome is bool false when enemy wins

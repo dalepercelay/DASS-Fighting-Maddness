@@ -33,7 +33,7 @@ def create_user(name: str):
     except IntegrityError:
         return "create user: INTEGRITY ERROR!"
     
-    return f"Successfully created a user: {user_id}"
+    return {"user_id": user_id}
 
 if __name__ == "__main__":
     print(create_user())
