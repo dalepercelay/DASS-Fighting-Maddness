@@ -1,9 +1,9 @@
-###Peer review feedback
+<h1>Peer review feedback</h1>
 
-##SCHEMA
+<h2>SCHEMA</h2>
 
-#Victoria
-You could name columns a little more clearly. For example, you may want to change "time" to "timestamp" so it's clear that it's a timestamp and others don't need to make assumptions.
+<h3>Victoria</h3>
+1. You could name columns a little more clearly. For example, you may want to change "time" to "timestamp" so it's clear that it's a timestamp and others don't need to make assumptions.
 We did not change time to timestamp because it is clear to us.
 In the insert statements you're assigning values to columns that are auto generated. I'd suggest setting them to default for consistency.
 That would’ve been our first move, but because we pre-inserted it, we needed the id’s in order to update the transaction table. Of course, we can use the RETURNING statement, but we would have to execute more SQL statements due to the fact that we are pre-inserting more than one animal in admin.py
