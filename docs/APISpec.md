@@ -103,6 +103,7 @@ Response:
 
 ```
 {
+	"animal used to fight": "string"
 	"reward": "integer"
 	"bonus": "integer"
 	"enemy fought": "string"
@@ -131,6 +132,8 @@ Request:
 
 ```
 {
+	"user_id": "integer",
+	"animal_id": "integer,
 	“gold”: “integer” /* how much gold invested into health */
 }
 ```

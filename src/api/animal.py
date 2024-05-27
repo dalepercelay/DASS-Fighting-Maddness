@@ -49,6 +49,54 @@ def create_animal(animal_name: str, attack: int, defense: int):
     return f"created animal id {animal_id}: {animal_name}, {attack}, {defense}" # animal_id
 
 
+# can buy multiple animals now
+@router.put("/buy")
+def buy_animal(animal_id: int, user_id: int):
+    '''Buy animal (only if you have enough gold)'''
+    status = False
+    try:
+        with db.engine.begin() as connection:
+            # check if user and animal actually exist
+            try:
+                connection.execute(sqlalchemy.text("SELECT name FROM users WHERE user_id = :user_id"), 
+                                      [{"user_id": user_id}]).fetchone()[0]
+                connection.execute(sqlalchemy.text("SELECT name FROM animals WHERE animal_id = :animal_id"), 
+                                      [{"animal_id": animal_id}]).fetchone()[0]
+            except TypeError:
+                return "The IDs you provided don't exist"
+    
+            # find user's gold
+            user = connection.execute(sqlalchemy.text("SELECT SUM(gold) AS gold FROM transactions WHERE user_id = :user_id"), 
+                                      [{"user_id": user_id}]).one()
+            
+            # find price of animal
+            animal = connection.execute(sqlalchemy.text("SELECT in_use, price FROM animals WHERE animal_id = :animal_id"), 
+                                        [{"animal_id": animal_id}]).one()
+
+            if user.gold >= animal.price:
+                print("user can afford animal")
+
+                # check if unowned
+                if(animal.in_use is False):
+                    print("animal is available")
+                    # add animal and user linked to animals_owned
+                    connection.execute(sqlalchemy.text("""INSERT INTO transactions (user_id, gold, description) 
+                                                       VALUES (:user_id, -:gold, :description)"""),
+                                                        [{"user_id": user_id, "gold": animal.price, "description": "buy animal"}])
+                    connection.execute(sqlalchemy.text("INSERT INTO animals_owned (user_id, animal_id) VALUES(:user_id, :animal_id)"), 
+                                      {"animal_id": animal_id, "user_id": user_id})
+                    connection.execute(sqlalchemy.text("UPDATE animals SET in_use = True WHERE animal_id = :animal_id"), 
+                                       [{"animal_id": animal_id}])
+                    status = True
+
+    except IntegrityError:
+        return "Buy Animal: INTEGRITY ERROR!"
+    
+    return {"delivery_status": status}
+
+
+
+"""
 @router.put("/buy")
 def buy_animal(animal_id: int, user_id: int):
     '''Buy animal (only if you have enough gold)'''
@@ -79,8 +127,9 @@ def buy_animal(animal_id: int, user_id: int):
                 if(animal.in_use is False):
                     print("animal is available")
                     # check if user already has an animal
-                    id = connection.execute(sqlalchemy.text("SELECT animal_id FROM users WHERE user_id = :user_id"), 
-                                            [{"user_id": user_id}]).one()
+                    #id = connection.execute(sqlalchemy.text("SELECT animal_id FROM users WHERE user_id = :user_id"), [{"user_id": user_id}]).one()
+                    id = connection.execute(sqlalchemy.text("SELECT animal_id FROM animals_owned WHERE user_id = :user_id"), [{"user_id": user_id}]).one()
+
                     if id.animal_id is not None:                        
                         # and reset animal health to 100 by finding the difference between 100
                         health = connection.execute(sqlalchemy.text("SELECT SUM(health) AS total_health FROM transactions WHERE animal_id = :animal_id"), 
@@ -96,13 +145,15 @@ def buy_animal(animal_id: int, user_id: int):
                                            [{"animal_id": id.animal_id}])
 
                     # insert into transactions 
-                    connection.execute(sqlalchemy.text("""INSERT INTO transactions (user_id, gold, description) 
-                                                       VALUES (:user_id, -:gold, :description)"""),
+                    connection.execute(sqlalchemy.text(""INSERT INTO transactions (user_id, gold, description) 
+                                                       VALUES (:user_id, -:gold, :description)""),
                                                         [{"user_id": user_id, "gold": animal.price, "description": "buy animal"}])
 
                     # update animal to user link
-                    connection.execute(sqlalchemy.text("UPDATE users SET animal_id = :animal_id WHERE user_id = :user_id"), 
-                                       [{"animal_id": animal_id, "user_id": user_id}])
+                    #connection.execute(sqlalchemy.text("UPDATE users SET animal_id = :animal_id WHERE user_id = :user_id"), 
+                                      # [{"animal_id": animal_id, "user_id": user_id}])
+                    connection.execute(sqlalchemy.text("INSERT animals_owned (user_id, animal_id) VALUES(:user_id, :animal_id)"), 
+                                      [{"animal_id": animal_id, "user_id": user_id}])
                     connection.execute(sqlalchemy.text("UPDATE animals SET in_use = True WHERE animal_id = :animal_id"), 
                                        [{"animal_id": animal_id}])
 
@@ -112,3 +163,6 @@ def buy_animal(animal_id: int, user_id: int):
         return "Buy Animal: INTEGRITY ERROR!"
     
     return {"delivery_status": status}
+
+
+"""

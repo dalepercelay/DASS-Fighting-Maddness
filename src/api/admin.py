@@ -11,6 +11,7 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
+# comment out before pushing to github
 @router.post("/reset")
 def reset():    
     '''This endpoint is primarily for debugging and resets all tables and populates example data'''
@@ -19,15 +20,15 @@ def reset():
         with db.engine.begin() as connection:
             sql = ""
             # reset tables
-            sql += "TRUNCATE TABLE fights, enemies, animals, users, transactions;"
+            sql += "TRUNCATE TABLE animals_owned, fights, enemies, animals, users, transactions;"
             # pre-insert 2 animals
             sql += """INSERT INTO animals (animal_id, name, attack, defense, price) 
                     VALUES (1, 'FeeFee', 45, 30, 75);
                     INSERT INTO animals (animal_id, name, attack, defense, price) 
                     VALUES (2, 'Kiwi', 50, 40, 90);"""
             # pre-insert 5 enemies
-            sql += """INSERT INTO enemies (name, attack, defense) VALUES ('Gollum', 60, 15);I
-            NSERT INTO enemies (name, attack, defense) VALUES ('FEELTH', 37, 56);
+            sql += """INSERT INTO enemies (name, attack, defense) VALUES ('Gollum', 60, 15);
+            INSERT INTO enemies (name, attack, defense) VALUES ('FEELTH', 37, 56);
             INSERT INTO enemies (name, attack, defense) VALUES ('GARY', 73, 20);
             INSERT INTO enemies (name, attack, defense) VALUES ('MiniMooBAMBA', 20, 70);
             INSERT INTO enemies (name, attack, defense) VALUES ('Mid', 50, 50);"""

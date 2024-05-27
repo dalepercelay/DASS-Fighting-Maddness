@@ -12,6 +12,7 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
+# fix where it shows all animals and their respective healths
 @router.get("/audit")
 def get_inventory(user_id: int):
     '''Returns the gold of the user, as well as the animal and animal health (if owned).'''
@@ -34,8 +35,10 @@ def get_inventory(user_id: int):
         return "get_inventory: INTEGRITY ERROR!"
     return {"gold": gold[0], "animal": animal, "animal health": health}
 
+
+# fix where you can pick to restock which animal
 @router.get("/restock")
-def restock(user_id: int, gold: int):
+def restock(user_id: int, animal_id: int, gold: int):
     '''Use gold to restore owned animal's health. 1 gold restores 2 health to a max of 100 health.'''
     #check if user has enough gold
     try:

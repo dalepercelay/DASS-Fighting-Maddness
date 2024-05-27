@@ -11,29 +11,37 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
+# can now pick whichever animal to fight
 @router.post("/")
-def create_fight(user_id:int, payment:int):
+def create_fight(user_id: int, animal_id: int, payment:int):
     '''Create a fight. If won, reward of 10 gold plus bonus of specified payment * 10. 
     If fight lost, gold paid is lost as well. Animal can lose health during a fight'''
+
     try:
         with db.engine.begin() as connection:
-            # make sure user has an animal before fighting
-            animal_id = connection.execute(sqlalchemy.text("SELECT animal_id FROM users WHERE user_id = :user_id"), {"user_id": user_id}).fetchone()[0]
-            if animal_id is None:
-                return "Cannot fight because you don't have an animal! Buy one at the shop!"
+            # make sure payment isn't a negative number
+            if payment <= 0:
+                return "Cannot accept your payment."
             
-            sql_query = """SELECT a.name, u.name, a.attack, a.defense, a.health FROM users u
-                        JOIN animals a ON u.animal_id = a.animal_id
-                        WHERE u.user_id = :user_id"""
-            animal_name, username, attack, defense, health = connection.execute(sqlalchemy.text(sql_query), {"user_id":user_id}).fetchone()
-            
+            # make sure the animal and user ids exist
+            try:
+                username = connection.execute(sqlalchemy.text("SELECT name FROM users WHERE user_id = :user_id"), 
+                                      [{"user_id": user_id}]).fetchone()[0]
+                connection.execute(sqlalchemy.text("SELECT name FROM animals WHERE animal_id = :animal_id"), 
+                                      [{"animal_id": animal_id}]).fetchone()[0]
+                # check to make sure it's owned by the right user
+                check = connection.execute(sqlalchemy.text("SELECT user_id FROM animals_owned WHERE animal_id = :animal_id"), {"animal_id": animal_id}).fetchone()[0]
+                if check != user_id:
+                    return "Animal isn't owned by you so you cannot fight with that animal. >:C"
+            except TypeError:
+                return "The IDs you provided don't exist"
+            animal_name, attack, defense = connection.execute(sqlalchemy.text("SELECT name, attack, defense FROM animals WHERE animal_id = :animal_id"), {"animal_id": animal_id}).fetchone()
+            health = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), {"animal_id": animal_id}).fetchone()[0]
+            animal_h = health
+            print('animal health is' + str(animal_h) + " " + str(animal_id))
             # make sure animal health isn't less than 10!
-            animal_health = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), {"animal_id": animal_id})
-            if animal_health.fetchone()[0] <= 10:
-                # make user lose the animal
-                connection.execute(sqlalchemy.text("""UPDATE animals SET user_id = NULL WHERE user_id = :user_id; 
-                                                   UPDATE users SET animal_id = NULL WHERE user_id = :user_id"""), [{"user_id": user_id}])
-                return "Cannot fight! Animal is too injured! Buy another one at the shop!"
+            if animal_h <= 10:
+                return "Cannot fight! Animal is too injured! Restock its health at the store!"
             
             loser = False
             bonus = 0
@@ -90,9 +98,6 @@ def create_fight(user_id:int, payment:int):
             # update transactions table for result 
             result_sql = """INSERT INTO transactions (user_id, gold, description, animal_id) 
             VALUES (:user_id, :gold, :description, :animal_id);"""
-            # update animal health
-            animal_h = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), {"animal_id": animal_id})
-            animal_h = animal_h.fetchone()[0]
             # always make sure animal health can only go down to 0 minimum
             if animal_h - total_user_damage <= 0:
                 total_user_damage = animal_h
@@ -104,6 +109,7 @@ def create_fight(user_id:int, payment:int):
         return "create fight: INTEGRITY ERROR!"
         
     return {
+        "animal used to fight": animal_name,
         "reward" : reward,
         "bonus"  : bonus,
         "enemy fought": enemy_name,

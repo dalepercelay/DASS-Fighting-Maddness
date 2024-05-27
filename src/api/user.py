@@ -6,8 +6,6 @@ from src.api import auth
 import sqlalchemy
 from src import database as db
 
-# create user
-
 router = APIRouter(
     prefix="/user",
     tags=["user"],
