@@ -4,6 +4,7 @@
 
 <h3>Victoria</h3>
 1. You could name columns a little more clearly. For example, you may want to change "time" to "timestamp" so it's clear that it's a timestamp and others don't need to make assumptions.
+
 1a. We did not change time to timestamp because it is clear to us.
 
 2. In the insert statements you're assigning values to columns that are auto generated. I'd suggest setting them to default for consistency.
