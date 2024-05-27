@@ -35,33 +35,33 @@
 15. Audit endpoint requests user_id, but says username in API specs
 * We have fixed it where we only accept user_id in the API_Specs
 
-#Ryan
-Be consistent with using the same data types
-We have fixed all ids to be int8 but we decided to keep other values such as health, attack, and defense as int4
-To Normalize data, add another table like animal_types
-Animals are all unique at the moment (no type/species) so they only have a name. 
-Check if certain columns should be nullable or not, for example name would be one.
-Name is required when creating a user so it will never be null in users. In transactions, a user doesn’t have to be associated with a transaction which is why it can be null. Also some of the foreign keys are null because we are purposely combining animal and user transactions all in one table rather than 2 for easier convenience.
-There is a circular dependency on users table and animals table
-We have fixed that by deleting the user_id from the animals table.
-The foreign keys in the fight table are nullable and should not be.
-We have fixed that. We disabled the allow nullable option for our table
-Add descriptions on the endpoint docs so that it is more easy to see what you're doing
-Have added comments at the beginning of each method that can be seen in docs.
-Shorten the names of endpoints so they don't use create	
-We think it’s more clear to write create because we have create and buy functions for both animals and users.
-buy_animal() doesn't need animal_name for the JSON request since it's in the path.
-We have decided to eliminate the {buy_animal} in the path
-When executing an audit for a non-existing user it has an internal server error.
-We have fixed it and now it would return a message saying “user id of [user_id] doesn’t exist”
-When executing restock with non-existing user, internal server occurs
-We have fixed that and the message of “No user found” will be returned next time
-When executing restock with a user that doesn't own an animal, internal server error occurs.
-Fixed it where if a user doesn't own an animal, the message of “Unable to restock. You don't own an animal” pops up
-When executing create-animal, constraints aren't being enforced.
-Enforced constraints in the database that attack/defense can only be between -1 - 81.
-When executing Restock after an animal has no health gold is still removed even though you can't restock health at that point but it shouldn't take gold.
-Made it so that a user can’t use negative gold to take away health. When an animal has no health you can still restock health (it isn’t dead, just tired…)
+<h3>Ryan</h3>
+1. Be consistent with using the same data types
+* We have fixed all ids to be int8 but we decided to keep other values such as health, attack, and defense as int4
+2. To Normalize data, add another table like animal_types
+* Animals are all unique at the moment (no type/species) so they only have a name. 
+3. Check if certain columns should be nullable or not, for example name would be one.
+* Name is required when creating a user so it will never be null in users. In transactions, a user doesn’t have to be associated with a transaction which is why it can be null. Also some of the foreign keys are null because we are purposely combining animal and user transactions all in one table rather than 2 for easier convenience.
+4. There is a circular dependency on users table and animals table
+* We have fixed that by deleting the user_id from the animals table.
+5. The foreign keys in the fight table are nullable and should not be.
+* We have fixed that. We disabled the allow nullable option for our table
+6. Add descriptions on the endpoint docs so that it is more easy to see what you're doing
+* Have added comments at the beginning of each method that can be seen in docs.
+7. Shorten the names of endpoints so they don't use create	
+* We think it’s more clear to write create because we have create and buy functions for both animals and users.
+8. buy_animal() doesn't need animal_name for the JSON request since it's in the path.
+* We have decided to eliminate the {buy_animal} in the path
+9. When executing an audit for a non-existing user it has an internal server error.
+* We have fixed it and now it would return a message saying “user id of [user_id] doesn’t exist”
+10. When executing restock with non-existing user, internal server occurs
+* We have fixed that and the message of “No user found” will be returned next time
+11. When executing restock with a user that doesn't own an animal, internal server error occurs.
+* Fixed it where if a user doesn't own an animal, the message of “Unable to restock. You don't own an animal” pops up
+12. When executing create-animal, constraints aren't being enforced.
+* Enforced constraints in the database that attack/defense can only be between -1 - 81.
+13. When executing Restock after an animal has no health gold is still removed even though you can't restock health at that point but it shouldn't take gold.
+* Made it so that a user can’t use negative gold to take away health. When an animal has no health you can still restock health (it isn’t dead, just tired…)
 
 #Joshua
 Change /create-users to just /users as a POST call implies creating a user.
