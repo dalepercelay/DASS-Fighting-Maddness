@@ -12,7 +12,7 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
-@router.post("/create-user")
+@router.post("/create")
 def create_user(name: str):
     '''Create a user.'''
     # create a user

@@ -13,9 +13,9 @@ router = APIRouter(
 )
 
 # fix where it shows all animals and their respective healths
-@router.get("/inventory")
+@router.get("")
 def get_inventory(user_id: int):
-    '''Returns the gold of the user, as well as the animal and animal health (if owned).'''
+    '''Returns the gold of the user, as well as the animal(s) and animal health (if owned).'''
     # query in the actual data    
     try:
         with db.engine.begin() as connection:
@@ -45,7 +45,7 @@ def get_inventory(user_id: int):
 
 
 # fix where you can pick to restock which animal
-@router.get("/restore")
+@router.post("/restore")
 def restore_health(user_id: int, animal_id: int, gold: int):
     '''Use gold to restore owned animal's health. 1 gold restores 2 health to a max of 100 health.'''
     #check if user has enough gold

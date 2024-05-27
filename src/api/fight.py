@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 # can now pick whichever animal to fight
-@router.post("/")
+@router.post("")
 def create_fight(user_id: int, animal_id: int, payment:int):
     '''Create a fight. If won, reward of 10 gold plus bonus of specified payment * 10. 
     If fight lost, gold paid is lost as well. Animal can lose health during a fight'''

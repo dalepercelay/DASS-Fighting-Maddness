@@ -11,28 +11,32 @@
 7. `Restock on Resources` (buying health)
 
 **Get Catalog of Animals - GET Method** `/catalog`
-Description: Gets a catalog of all the animals available for purchase. One user can have an animal at a time - when they get the animal, it is removed from catalog by their availability = FALSE.
+Description: Gets a catalog of all the animals available for purchase. One user can have multiple animals at a time - when they get the animal, it is removed from catalog by their availability = FALSE.
+
 Response:
 
 ```
-{
-	“id”: “integer”
-	“name”: “string”
-	“attack”: “integer” /* between 1 and 100 */
-	"defense": "integer" /* between 1 and 100 */
-	“price”: “integer”
-}
+[
+	{
+		“id”: “integer”
+		“name”: “string”
+		“attack”: “integer” /* between 1 and 100 */
+		"defense": "integer" /* between 1 and 100 */
+		“price”: “integer”
+	}
+]
 ```
 
-**Create an Animal - POST Method `/create-animal/{name}`**
-Description: Users can create animals (with given name, stats - we create id)
+**Create an Animal - POST Method `/animal/create`**
+Description: Users can create animals (with given name, stats - we create id). Price is equal
+to attack + defense. All animals have distinct names and ids.
 Request:
 
 ```
 {
-	“name”: “string”
-	“defense”: “integer” /* between 1 and 80 */
+	“aniaml_name”: “string”
 	"attack": "integer" /* between 1 and 80 */
+	“defense”: “integer” /* between 1 and 80 */
 }
 ```
 
@@ -44,8 +48,8 @@ Response:
 }
 ```
 
-**Create User - POST Method `/create-user/{name}`**
-Description: Given a name, it creates a user which has a starting gold of 200, and no animals for fighting.
+**Create User - POST Method `/user/create`**
+Description: Given a name, it creates a user which has a starting gold of 200, and no animals for fighting. All users must have unique names.
 Request:
 
 ```
@@ -62,14 +66,14 @@ Response:
 }
 ```
 
-**Buy an Animal - POST Method `/buy-animal/{animal_name}`**
-Description: Buy an animal (if the user has enough gold). Return True if delivery was successful (user had enough gold to buy) otherwise False. (An animal starts with 100 health. If their health gets to 0, they cannot be used by the user anymore)
+**Buy an Animal - PUT Method `/animal/buy`**
+Description: Buy an animal (if the user has enough gold). Return True if delivery was successful (user had enough gold to buy) otherwise False. (An animal starts with 100 health. If their health gets <=10, a user can restore the animal's health, otherwise the animal will be unable to fight)
 Request:
 
 ```
 {
-	“animal_name”: “string”
-	"user_name": "string"
+	“animal_id”: "integer"
+	"user_id": "integer"
 }
 ```
 
@@ -81,20 +85,21 @@ Response:
 }
 ```
 
-**Create a Fight - POST Method `/fight/`**
-Description: Everyday, there will be one main fight/battle. Users will pay any amount of gold (basically betting in your luck) in order to participate in the fight. A random enemy will be picked out in the database table called Enemies to fight, and they will have their own respective stats, health, and name.
+**Create a Fight - POST Method `/fight`**
+Description: Users can initiate fights with preset enemies to earn gold. Users will pay any amount of gold (basically betting in your luck) in order to participate in the fight. A random enemy will be picked out in the database table called Enemies to fight, and they will have their own respective stats, health, and name.
 
 There will be three rounds of fighting total. Each round, for both sides, there will be a probability from 1 - 35 and whatever that number is, it will be subtracted from the main health points. Whoever has the lowest amount of health by the end of the three rounds will be the winner, and of course if one side has less than 0 or reached 0 health points, then automatically the other side wins. The 1 - 35 is just an average range of health points you can lose in one round. The higher the defense and attack stats are, the lower the range can go to decrease the amount of health points you lose. Vice versa for the lower the defense and attack stats are, the higher the range of points you can lose will be.
 
-Winning the fight would allow them to earn money based on how much they choose to bet their gold by 10. For example, if a user bet 10 gold and won the battle, then they can get 100 gold total from the battle (aka bonus) plus 10 gold as a congratulations reward. If they lose the fight though, they just lose the gold they originally bet in the first place. Furthermore, if they lose, their animal' health is decreased by 20.
+Winning the fight would allow them to earn money based on how much they choose to bet their gold by 10. For example, if a user bet 10 gold and won the battle, then they can get 100 gold total from the battle (aka bonus) plus 10 gold as a base congratulations reward. If they lose the fight though, they just lose the gold they originally bet in the first place. Furthermore, if they lose, their animal' health is decreased by 20.
 
-Additionally, if their animal is too weak (health is less than or equal to 10) because the user hasn't restocked them, they will lose that animal completely so it's important to occassionally check up on the inventory!!
+Additionally, if their animal is too weak (health is less than or equal to 10) because the user hasn't restocked them, they will be unable to fight!!
 
 Request:
 
 ```
 {
 	“user_id”: “integer”
+	"animal_id": integer"
 	“payment”: “integer”
 }
 ```
@@ -111,7 +116,7 @@ Response:
 }
 ```
 
-**Leaderboard - GET Method `/leaderboard/`**
+**Leaderboard - GET Method `/leaderboard`**
 Description: Everyday, the leaderboard would be updated based on the rankings of users with the highest amount of gold
 
 Response: (ordered by number of gold in ascending order)
@@ -123,7 +128,7 @@ Response: (ordered by number of gold in ascending order)
 }
 ```
 
-**Restock on Resources - POST Method `/restock/`**
+**Restock on Resources - POST Method `/inventory/restore`**
 Description: After every fight/battle, the user will need to purchase gold to restock their animal's health accordingly. They will purchase 10 gold for 20 health, 20 gold for 40 health, and 30 gold for 60 health.
 
 The maximum health they can fill up to is back to 100.
@@ -142,11 +147,11 @@ Response:
 
 ```
 {
-	“health”: “integer” /* return updated health (old + updated from gold) */
+	"restored {health} health with {gold} gold"
 }
 ```
 
-**Get Inventory - GET Method `/inventory/audit`**
+**Get Inventory - GET Method `/inventory`**
 Description: Retrieve user inventory
 Request:
 
@@ -161,7 +166,11 @@ Response:
 ```
 {
 	"gold": "integer"
-	“animal”: “str” (name of animal if it has one, otherwise it will return -1)
-	"health": "integer"
+	"animals":
+		[
+			"animal_id": "integer"
+			"animal_name": "string"
+			"health": "integer"
+		]
 }
 ```

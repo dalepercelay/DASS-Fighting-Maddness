@@ -11,7 +11,7 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
-@router.get("/")
+@router.get("")
 def leaderboard():
     '''Returns a list of all users ranked by gold.'''
     try:
