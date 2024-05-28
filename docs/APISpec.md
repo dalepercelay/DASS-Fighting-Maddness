@@ -20,8 +20,8 @@ Response:
 	{
 		“id”: “integer”
 		“name”: “string”
-		“attack”: “integer” /* between 1 and 100 */
-		"defense": "integer" /* between 1 and 100 */
+		“attack”: “integer” /* between 1 and 80 */
+		"defense": "integer" /* between 1 and 80 */
 		“price”: “integer”
 	}
 ]
