@@ -50,12 +50,12 @@ def create_fight(user_id: int, animal_id: int, payment:int):
             transaction_id = connection.execute(sqlalchemy.text("INSERT INTO transactions (user_id, description, gold)"
                                             "VALUES (:user_id, :description, :gold) RETURNING transaction_id"), 
                                             {"user_id": user_id, "description": description, "gold": -payment})
-            enemy_row = connection.execute(sqlalchemy.text("""SELECT enemy_id, name, health, attack, defense 
+            enemy_row = connection.execute(sqlalchemy.text("""SELECT enemy_id, name, attack, defense 
                                                            FROM enemies ORDER BY RANDOM() LIMIT 1""")).fetchone()
             enemy_id = enemy_row.enemy_id
             enemy_name = enemy_row.name
             enemy_stats = {"attack": enemy_row.attack, "defense": enemy_row.defense}
-            enemy_health = enemy_row.health
+            enemy_health = 100
             
             total_user_damage = 0
             total_enemy_damage = 0
