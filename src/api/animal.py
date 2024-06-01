@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from src.api import auth
 import sqlalchemy
 from src import database as db
+import time
 
 router = APIRouter(
     prefix="/animal",
@@ -16,6 +17,7 @@ def create_animal(animal_name: str, attack: int, defense: int):
     '''Create an animal to be listed in the catalog (price = attack + defense).'''
     # create an animal with animal name, attack and defense
     # price is equal to sum of the stats
+    start = time.time()
     try:
         if int(animal_name):
             return "Please name an animal with the alphabet."
@@ -45,7 +47,9 @@ def create_animal(animal_name: str, attack: int, defense: int):
 
     except IntegrityError:
         return "create animal: INTEGRITY ERROR!"
-
+    print("create animal")
+    end = time.time()
+    print(str((end - start) * 1000) + " ms")
     return f"created animal id {animal_id}: {animal_name}, {attack}, {defense}" # animal_id
 
 
@@ -53,6 +57,7 @@ def create_animal(animal_name: str, attack: int, defense: int):
 @router.put("/buy")
 def buy_animal(animal_id: int, user_id: int):
     '''Buy animal (only if you have enough gold)'''
+    start = time.time()
     status = False
     try:
         with db.engine.begin() as connection:
@@ -91,6 +96,10 @@ def buy_animal(animal_id: int, user_id: int):
 
     except IntegrityError:
         return "Buy Animal: INTEGRITY ERROR!"
+    
+    print("buy animal")
+    end = time.time()
+    print(str((end - start) * 1000) + " ms")
     
     return {"delivery_status": status}
 

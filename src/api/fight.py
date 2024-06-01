@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from src.api import auth
 import sqlalchemy
+import time
 from src import database as db
 import random
 router = APIRouter(
@@ -16,7 +17,7 @@ router = APIRouter(
 def create_fight(user_id: int, animal_id: int, payment:int):
     '''Create a fight. If won, reward of 10 gold plus bonus of specified payment * 10. 
     If fight lost, gold paid is lost as well. Animal can lose health during a fight'''
-
+    start = time.time()
     try:
         with db.engine.begin() as connection:
             # make sure payment isn't a negative number
@@ -27,16 +28,21 @@ def create_fight(user_id: int, animal_id: int, payment:int):
             try:
                 username = connection.execute(sqlalchemy.text("SELECT name FROM users WHERE user_id = :user_id"), 
                                       [{"user_id": user_id}]).fetchone()[0]
+                
                 connection.execute(sqlalchemy.text("SELECT name FROM animals WHERE animal_id = :animal_id"), 
                                       [{"animal_id": animal_id}]).fetchone()[0]
+                
                 # check to make sure it's owned by the right user
                 check = connection.execute(sqlalchemy.text("SELECT user_id FROM animals_owned WHERE animal_id = :animal_id"), {"animal_id": animal_id}).fetchone()[0]
+                
                 if check != user_id:
                     return "Animal isn't owned by you so you cannot fight with that animal. >:C"
             except TypeError:
                 return "The IDs you provided don't exist"
             animal_name, attack, defense = connection.execute(sqlalchemy.text("SELECT name, attack, defense FROM animals WHERE animal_id = :animal_id"), {"animal_id": animal_id}).fetchone()
+            
             health = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), {"animal_id": animal_id}).fetchone()[0]
+            
             animal_h = health
             print('animal health is' + str(animal_h) + " " + str(animal_id))
             # make sure animal health isn't less than 10!
@@ -47,11 +53,14 @@ def create_fight(user_id: int, animal_id: int, payment:int):
             bonus = 0
             reward = 0
             description = "FIGHT!"
-            transaction_id = connection.execute(sqlalchemy.text("INSERT INTO transactions (user_id, description, gold)"
-                                            "VALUES (:user_id, :description, :gold) RETURNING transaction_id"), 
+            transaction_id = connection.execute(sqlalchemy.text("INSERT INTO transactions (user_id, description, gold) VALUES (:user_id, :description, :gold) RETURNING transaction_id"), 
                                             {"user_id": user_id, "description": description, "gold": -payment})
+            
+
             enemy_row = connection.execute(sqlalchemy.text("""SELECT enemy_id, name, attack, defense 
                                                            FROM enemies ORDER BY RANDOM() LIMIT 1""")).fetchone()
+            
+            
             enemy_id = enemy_row.enemy_id
             enemy_name = enemy_row.name
             enemy_stats = {"attack": enemy_row.attack, "defense": enemy_row.defense}
@@ -95,6 +104,8 @@ def create_fight(user_id: int, animal_id: int, payment:int):
                                                VALUES (:outcome, :animal_id, :user_id, :enemy_id, :transaction_id);"""), 
                                {"outcome": outcome, "enemy_id": enemy_id, "animal_id": animal_id, "user_id": user_id, "transaction_id": transaction_id})
             
+            
+            
             # update transactions table for result 
             result_sql = """INSERT INTO transactions (user_id, gold, description, animal_id) 
             VALUES (:user_id, :gold, :description, :animal_id);"""
@@ -107,6 +118,10 @@ def create_fight(user_id: int, animal_id: int, payment:int):
 
     except IntegrityError:
         return "create fight: INTEGRITY ERROR!"
+    
+    print("fight")
+    end = time.time()
+    print(str((end - start) * 1000) + " ms")
         
     return {
         "animal used to fight": animal_name,
