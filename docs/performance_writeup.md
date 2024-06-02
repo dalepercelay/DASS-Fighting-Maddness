@@ -17,15 +17,32 @@ In this file, we create 100,000 users, 400,000 animals, and 20,000 enemies. Sinc
 # Performance tuning
 Get inventory
 Explain results:
+1. Seq Scan on animals_owned
+2. Parallel Seq Scan on transactions
+3. Index Scan using animal_pkey on animals
+4. Parallel Seq Scan on transactions
 Create index SQL:
+1. CREATE INDEX idx_transactions_user_id ON transactions(user_id);
+2. CREATE INDEX idx_transactions_animal_id ON transactions(animal_id);
 Explain results (after creating index):
-Performance improved?:
+1. Seq Scan on animals_owned
+2. Index Scan using idx_transactions_user_id on transactions
+3. Index Scan using animal_pkey on animals
+4. Index Scan using idx_transactions_animal_id on transactions
+Performance improved?: yes
 
 Create animal
 Explain results:
+1. Parallel Seq Scan on animals
+2. Insert on animals
+3. Insert on transactions
 Create index SQL:
+1. CREATE INDEX idx_animals_name ON animals(UPPER(name));
 Explain results (after creating index):
-Performance improved?:
+1. Bitmap Heap Scan on animals
+2. Insert on animals
+3. Insert on transactions
+Performance improved?: yes
 
 Leaderboard
 Explain results:
