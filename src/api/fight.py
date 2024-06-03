@@ -66,15 +66,53 @@ def create_fight(user_id: int, animal_id: int, payment:int):
             enemy_stats = {"attack": enemy_row.attack, "defense": enemy_row.defense}
             enemy_health = 100
             
+            enemy_dialogue = {
+                0: f" ate your {animal_name} and regurgitated it whole!!! RAA!",
+                1: f" breathed fire on your {animal_name} 10 times!!! Beware of its owner, Angela.",
+                2: f" wiggled its tail and casted a big wiggly wobbly spell on {animal_name}!",
+                3: f" stomped on your {animal_name}'s foot!",
+                4: f" screamed hysterically at {animal_name}!",
+                5: f" performed water-breathing technique at your {animal_name}!",
+                6: f" performed a spell and screamed 'ANGELATO!!' at {animal_name}!",
+                7: f" yelled 'PERCELAY! AAAA' at {animal_name}!",
+                8: f" threw a basektball at {animal_name} and yelled 'SRISH!'",
+                9: f" created a loud noise towards {animal_name} and screamed 'I AM TAYLOR SRISH'",
+                10: f" threw a SOFA on {animal_name}!!!!!!!",
+                11: f" summoned hail on {animal_name} and screamed 'DALE GINGER ALE'!!",
+                12: f" did the powerful floss, winked, and said 'SRISH TAUGHT ME' at {animal_name}!",
+                13: f" did a princess Sophia spell on {animal_name} and sang, bursting your eardrums!",
+                14: f" growled 'AUNTIE A' and created an earthquake where {animal_name} was standing!",
+                15: f" casted the 'swish srish lala angela dale kale' spell on {animal_name}!"
+            }
+            
+            user_dialogue = {
+                0: f" fought back {enemy_name} fiercly with a stick!",
+                1: f" grew in size to punch them {enemy_name} back!",
+                2: f" defended itself from {enemy_name}!",
+                3: f" created a magical ball of light towards {enemy_name}!",
+                4: f" blasted a fireball at {enemy_name}.",
+                5: f" danced around {enemy_name} to distract them.",
+                6: f" slapped {enemy_name}!",
+                7: f" threw a waterball at {enemy_name}!",
+                8: f" created a tornado around {enemy_name}!"
+            }
+                        
             total_user_damage = 0
             total_enemy_damage = 0
+            dialogue = ""
             if animal_name:
                 for i in range(3):
-                    user_damage = random.randint(1, 50) - (attack - enemy_stats["defense"])
+                    # user dialogue
+                    u_d = random.randint(0, 8)
+                    dialogue += animal_name + user_dialogue[u_d] + " "
+                    # enemy dialogue
+                    e_d = random.randint(0, 15)
+                    dialogue += enemy_name + enemy_dialogue[e_d] + " "
+                    user_damage = random.randint(1, 10) - (attack - enemy_stats["defense"])
                     # min damage user can incur each round (out of 3) is 7
                     min_damage = 7
                     total_user_damage += max(min_damage, user_damage)
-                    enemy_damage = random.randint(1, 35) - (enemy_stats["attack"] - defense)
+                    enemy_damage = random.randint(1, 10) - (enemy_stats["attack"] - defense)
                     # min damage enemy can incur each round (out of 3) is 7
                     total_enemy_damage += max(min_damage, enemy_damage)
                     if health-total_user_damage <= 0 or enemy_health-total_enemy_damage <= 0:
@@ -124,6 +162,7 @@ def create_fight(user_id: int, animal_id: int, payment:int):
     print(str((end - start) * 1000) + " ms")
         
     return {
+        "battle summary": f"{dialogue}",
         "animal used to fight": animal_name,
         "reward" : reward,
         "bonus"  : bonus,

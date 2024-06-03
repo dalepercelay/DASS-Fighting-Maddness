@@ -108,6 +108,7 @@ Response:
 
 ```
 {
+	"battle summary": "string"
 	"animal used to fight": "string"
 	"reward": "integer"
 	"bonus": "integer"
