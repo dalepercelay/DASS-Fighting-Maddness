@@ -46,6 +46,16 @@ Performance improved?: yes
 
 Leaderboard
 Explain results:
+1. Sort Method: top-N heapsort Memory
+2. Hash aggregate on users.name
+3. Parallel seq scan on users 
+4. Parallel seq scan on transactions
 Create index SQL:
+1. CREATE INDEX idx_users_name ON users (name);
+2. CREATE INDEX idx_transactions_gold ON transactions (gold);
 Explain results (after creating index):
-Performance improved?:
+1. Index scan on transactions
+2. Group aggregate on users.name
+3. Index Scan on users
+
+Performance improved?: yes
