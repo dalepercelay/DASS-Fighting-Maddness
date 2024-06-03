@@ -53,10 +53,15 @@ def restore_health(user_id: int, animal_id: int, gold: int):
         with db.engine.begin() as connection:
             # first find out if an animal exists for user
             try:
+                try:
+                    connection.execute(sqlalchemy.text("""SELECT user_id FROM users WHERE user_id = :user_id"""))
+                except:
+                    return "User_id does not exist."
                 animal_id_result = connection.execute(sqlalchemy.text("""SELECT animal_id FROM animals_owned 
                                                             WHERE user_id = :user_id 
                                                                AND animal_id = :animal_id"""), 
                                                             [{"user_id": user_id, "animal_id": animal_id}]).fetchone().animal_id
+                
                 if animal_id_result is not None:
                     print("User owns animal, able to heal")
             except sqlalchemy.exc.NoResultFound:
