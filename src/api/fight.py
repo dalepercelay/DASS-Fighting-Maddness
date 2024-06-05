@@ -75,12 +75,12 @@ def create_fight(user_id: int, animal_id: int, payment:int):
             enemy_health = 100
             
             enemy_dialogue = {
-                0: f" ate your {animal_name} and regurgitated it whole!!! RAA!",
-                1: f" breathed fire on your {animal_name} 10 times!!! Beware of its owner, Angela.",
-                2: f" wiggled its tail and casted a big wiggly wobbly spell on {animal_name}!",
-                3: f" stomped on your {animal_name}'s foot!",
+                0: f" ate your {animal_name} and regurgitated it whole- a special technique taught by Angela!!! RAA!",
+                1: f" breathed fire on your {animal_name} 10 times just like their master, God Srish!!! Beware of its owner, Angela.",
+                2: f" wiggled its tail and casted a big wiggly wobbly spell on {animal_name}, taught by Master Dale!",
+                3: f" stomped on your {animal_name}'s foot like the way Dale would stomp his shoes!",
                 4: f" screamed hysterically at {animal_name}!",
-                5: f" performed water-breathing technique at your {animal_name}!",
+                5: f" performed water-breathing technique at your {animal_name}, just like how Angela would. The idea of her technique came from her drinking water in class.!",
                 6: f" performed a spell and screamed 'ANGELATO!!' at {animal_name}!",
                 7: f" yelled 'PERCELAY! AAAA' at {animal_name}!",
                 8: f" threw a basektball at {animal_name} and yelled 'SRISH!'",
