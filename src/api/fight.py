@@ -39,6 +39,14 @@ def create_fight(user_id: int, animal_id: int, payment:int):
                     return "Animal isn't owned by you so you cannot fight with that animal. >:C"
             except TypeError:
                 return "The IDs you provided don't exist"
+            
+            gold = connection.execute(sqlalchemy.text("""SELECT SUM(gold) AS gold FROM 
+                                                      transactions WHERE user_id = :user_id"""), 
+                                                      [{"user_id": user_id}]).one().gold
+            
+            if payment > gold:
+                return "User has insufficient gold for payment"
+            
             animal_name, attack, defense = connection.execute(sqlalchemy.text("SELECT name, attack, defense FROM animals WHERE animal_id = :animal_id"), {"animal_id": animal_id}).fetchone()
             
             health = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), {"animal_id": animal_id}).fetchone()[0]
