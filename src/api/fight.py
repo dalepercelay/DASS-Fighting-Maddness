@@ -90,7 +90,8 @@ def create_fight(user_id: int, animal_id: int, payment:int):
                 12: f" did the powerful floss, winked, and said 'SRISH TAUGHT ME' at {animal_name}!",
                 13: f" did a princess Sophia spell on {animal_name} and sang, bursting your eardrums!",
                 14: f" growled 'AUNTIE A' and created an earthquake where {animal_name} was standing!",
-                15: f" casted the 'swish srish lala angela dale kale' spell on {animal_name}!"
+                15: f" casted the 'swish srish lala angela dale kale' spell on {animal_name}!",
+                16: f" screamed OOH OOH OOH OOH DASS DASS DASS DASS US US US US to {animal_name}"
             }
             
             user_dialogue = {
@@ -114,7 +115,7 @@ def create_fight(user_id: int, animal_id: int, payment:int):
                     u_d = random.randint(0, 8)
                     dialogue += animal_name + user_dialogue[u_d] + " "
                     # enemy dialogue
-                    e_d = random.randint(0, 15)
+                    e_d = random.randint(0, 16)
                     dialogue += enemy_name + enemy_dialogue[e_d] + " "
                     user_damage = random.randint(1, 10) - (attack - enemy_stats["defense"])
                     # min damage user can incur each round (out of 3) is 7
