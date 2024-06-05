@@ -38,9 +38,9 @@ def get_inventory(user_id: int):
             if len(animal_ids) > 0:
                 for i in animal_ids:
                     # get the animal name
-                    animal = connection.execute(sqlalchemy.text("SELECT name FROM animals WHERE animal_id = :animal_id"), [{"animal_id": i}]).fetchone()[0]
+                    animal = connection.execute(sqlalchemy.text("SELECT name, attack, defense FROM animals WHERE animal_id = :animal_id"), [{"animal_id": i}]).fetchone()
                     health = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), [{"animal_id": i}]).fetchone()[0]
-                    animals.append({"animal_id": i, "animal_name": animal, "health": health})
+                    animals.append({"animal_id": i, "animal_name": animal.name, "health": health, "attack": animal.attack, "defense": animal.defense})
             else:
                 animals = "No animal in inventory"
                 # animal = "No animal in inventory"
@@ -86,6 +86,8 @@ def restore_health(user_id: int, animal_id: int, gold: int):
             if user.gold > gold:
                 print("User has enough gold to restore health")
                 health = gold * 2
+            else:
+                return "User does not have gold specified to restore health"
 
             # find out how much health the animal has
             health_ani = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), {"animal_id": animal_id_result.animal_id}).fetchone()[0]
