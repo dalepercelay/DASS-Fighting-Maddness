@@ -19,6 +19,12 @@ def get_inventory(user_id: int):
     # query in the actual data    
     try:
         with db.engine.begin() as connection:
+            try:
+                connection.execute(sqlalchemy.text("SELECT name FROM users WHERE user_id = :user_id"), 
+                                      [{"user_id": user_id}]).fetchone()[0]
+            except:
+                return "User_id does not exist."
+            
             ids = connection.execute(sqlalchemy.text("SELECT animal_id FROM animals_owned WHERE user_id = :user_id"), [{"user_id": user_id}])
             animal_ids = []
             if ids is None:
@@ -52,18 +58,20 @@ def restore_health(user_id: int, animal_id: int, gold: int):
     try:
         with db.engine.begin() as connection:
             # first find out if an animal exists for user
+            user_exists = connection.execute(sqlalchemy.text("SELECT 1 FROM users WHERE user_id = :user_id"), {"user_id": user_id}).fetchone()
+            if not user_exists:
+                return "User_id does not exist."
+    
             try:
-                try:
-                    connection.execute(sqlalchemy.text("""SELECT user_id FROM users WHERE user_id = :user_id"""))
-                except:
-                    return "User_id does not exist."
                 animal_id_result = connection.execute(sqlalchemy.text("""SELECT animal_id FROM animals_owned 
                                                             WHERE user_id = :user_id 
                                                                AND animal_id = :animal_id"""), 
-                                                            [{"user_id": user_id, "animal_id": animal_id}]).fetchone().animal_id
+                                                            [{"user_id": user_id, "animal_id": animal_id}]).fetchone()
                 
                 if animal_id_result is not None:
                     print("User owns animal, able to heal")
+                else:
+                    return ("User does not own animal")
             except sqlalchemy.exc.NoResultFound:
                 return "Unable to restock. You don't own an animal!"
             # find user's gold
@@ -80,7 +88,7 @@ def restore_health(user_id: int, animal_id: int, gold: int):
                 health = gold * 2
 
             # find out how much health the animal has
-            health_ani = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), {"animal_id": animal_id_result}).fetchone()[0]
+            health_ani = connection.execute(sqlalchemy.text("SELECT SUM(health) FROM transactions WHERE animal_id = :animal_id"), {"animal_id": animal_id_result.animal_id}).fetchone()[0]
             # cap max health at 100
             try:
                 if health_ani + health >= 100:
