@@ -1,9 +1,10 @@
 # DASS Fighting Madness!!
 
+## Developers:
+1. dpercela@calpoly.edu Dale Percelay
+2. achen313@calpoly.edu Angela Chen
+3. schan100@calpoly.edu Sophia Chang
+4. sguhamau@calpoly.edu Srish Maulik
+<b>Dass us!</b>
 
-dpercela@calpoly.edu Dale Percelay
-achen313@calpoly.edu Angela Chen
-schan100@calpoly.edu Sophia Chang
-sguhamau@calpoly.edu Srish Maulik
-
-We will be owning animals in a world called DASS and the shop will have the animals' names, statistics, price. We plan on selling animals only for one fight to users, where they can temporarily use it to fight enemies to get more money if they win. We will then create a ranking board for users based on how much gold they have for a week.
+There is a beautiful world called DASS that people live in and a main shop. The shop sells animals and users can purchase them in order to engage in fights to win gold. There is a leaderboard to track who is in the lead by gold, and an inventory check where users can check their animals' healths and gold.
