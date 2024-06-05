@@ -94,8 +94,8 @@ def create_fight(user_id: int, animal_id: int, payment:int):
             }
             
             user_dialogue = {
-                0: f" fought back {enemy_name} fiercly with a stick!",
-                1: f" grew in size to punch them {enemy_name} back!",
+                0: f" fought back {enemy_name} fiercely with a stick!",
+                1: f" grew in size to punch {enemy_name} back!",
                 2: f" defended itself from {enemy_name}!",
                 3: f" created a magical ball of light towards {enemy_name}!",
                 4: f" blasted a fireball at {enemy_name}.",
